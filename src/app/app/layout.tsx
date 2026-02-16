@@ -3,6 +3,8 @@ import { getSession, getDemoEnabled } from "@/lib/auth";
 import { AppShell } from "@/components/app/AppShell";
 import { Skeleton } from "@/components/ui/skeleton";
 
+export const dynamic = "force-dynamic";
+
 async function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const [session, demoEnabled] = await Promise.all([getSession(), getDemoEnabled()]);
   return (

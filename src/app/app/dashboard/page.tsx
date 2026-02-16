@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import { getSession, getDemoEnabled } from "@/lib/auth";
 import {
@@ -16,11 +17,16 @@ import { LeadStatusPill } from "@/components/app/LeadStatusPill";
 import { DashboardAgentLeaderboard } from "@/components/app/DashboardAgentLeaderboard";
 import { EmptyState } from "@/components/app/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LeadActivityChart } from "@/components/app/LeadActivityChart";
-import { ActivityFeed } from "@/components/app/ActivityFeed";
+import { RecentActivity } from "@/components/app/RecentActivity";
+
+const LeadActivityChart = dynamic(
+  () => import("@/components/app/LeadActivityChart").then((m) => m.LeadActivityChart),
+  { loading: () => <Skeleton className="h-64 w-full rounded-xl" />, ssr: true }
+);
 import type { ActivityItem, Agent, Lead, DashboardStats } from "@/lib/types";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, UserPlus, MessageSquare, Route } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const DEFAULT_STATS: DashboardStats = {
   leadsToday: 0,
@@ -55,10 +61,11 @@ async function DashboardContent() {
   } else {
     try {
       const airtable = await import("@/lib/airtable");
-      const [realLeads, realAgents, realMessages] = await Promise.all([
+      const [realLeads, realAgents, realMessages, realActivity] = await Promise.all([
         airtable.getLeads(),
         airtable.getAgents(),
         airtable.getMessages(),
+        airtable.getRecentActivities(20),
       ]);
       stats = computeDashboardStatsFromLeads(realLeads ?? [], role, agentId);
       leads = realLeads ?? [];
@@ -69,11 +76,13 @@ async function DashboardContent() {
         createdAt: m.createdAt,
       }));
       agents = realAgents ?? [];
+      activity = realActivity ?? [];
     } catch {
       stats = computeDashboardStatsFromLeads([], role, agentId);
       leads = [];
       messages = [];
       agents = [];
+      activity = [];
     }
   }
 
@@ -146,7 +155,14 @@ async function DashboardContent() {
   if (!demoEnabled && leads.length === 0) {
     return (
       <div className="space-y-6 sm:space-y-8">
-        <PageHeader title="Dashboard" subtitle={`Welcome back, ${session?.name ?? "User"}`} />
+        <PageHeader
+          title="Dashboard"
+          subtitle={`Welcome back, ${session?.name ?? "User"}`}
+          breadcrumbs={[
+            { label: "Home", href: "/app/dashboard" },
+            { label: "Dashboard" },
+          ]}
+        />
         <EmptyState
           icon={BarChart3}
           title="No data yet"
@@ -164,7 +180,34 @@ async function DashboardContent() {
       <PageHeader
         title="Dashboard"
         subtitle={`Welcome back, ${session?.name ?? "User"}`}
+        breadcrumbs={[
+          { label: "Home", href: "/app/dashboard" },
+          { label: "Dashboard" },
+        ]}
       />
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/app/leads" className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            Add lead
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/app/messages" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            View inbox
+          </Link>
+        </Button>
+        {isOwner && (
+          <Button asChild variant="outline" size="sm">
+            <Link href="/app/routing" className="flex items-center gap-2">
+              <Route className="h-4 w-4" />
+              Routing
+            </Link>
+          </Button>
+        )}
+      </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {[
@@ -193,29 +236,36 @@ async function DashboardContent() {
 
       {isOwner && (
         <SectionCard title="Recent activity">
-          <ActivityFeed items={activity} />
+          <RecentActivity
+            items={activity}
+            emptyMessage={
+              !demoEnabled && leads.length === 0
+                ? "Connect Airtable in Settings to see activity."
+                : "No recent activity—add a lead!"
+            }
+          />
         </SectionCard>
       )}
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-2">
         <SectionCard title="Recent messages">
           {messages.length ? (
-            <ul className="space-y-0">
+            <ul className="divide-y divide-border rounded-md" role="list">
               {messages.map((m) => (
                 <li
                   key={m.id}
-                  className="min-h-[44px] flex items-center py-2 text-sm border-b border-border/60 last:border-0"
+                  className="min-h-[44px] flex items-center gap-2 py-3 text-sm"
                 >
                   <span
                     className={
                       m.direction === "in"
-                        ? "text-muted-foreground"
-                        : "text-foreground font-medium"
+                        ? "text-muted-foreground shrink-0"
+                        : "text-foreground font-medium shrink-0"
                     }
                   >
                     {m.direction === "in" ? "In" : "Out"}:
-                  </span>{" "}
-                  <span className="min-w-0 truncate">
+                  </span>
+                  <span className="min-w-0 truncate text-muted-foreground">
                     {m.body.slice(0, 60)}
                     {m.body.length > 60 ? "…" : ""}
                   </span>
@@ -223,7 +273,7 @@ async function DashboardContent() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">No recent messages</p>
+            <p className="text-sm text-muted-foreground py-4">No recent messages</p>
           )}
         </SectionCard>
 
@@ -234,24 +284,24 @@ async function DashboardContent() {
         ) : (
           <SectionCard title="My recent leads">
             {myLeads.length ? (
-              <ul className="space-y-0">
+              <ul className="divide-y divide-border rounded-md" role="list">
                 {myLeads.slice(0, 5).map((l) => (
                   <li
                     key={l.id}
-                    className="min-h-[44px] flex items-center gap-2 border-b border-border/60 last:border-0"
+                    className="min-h-[44px] flex items-center gap-2 py-3"
                   >
                     <Link
                       href={`/app/leads/${l.id}`}
-                      className="min-h-[44px] flex items-center flex-1 min-w-0 py-2 -my-0.5 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+                      className="flex-1 min-w-0 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded py-1"
                     >
-                      <span className="truncate">{l.name}</span>
+                      <span className="truncate block">{l.name}</span>
                     </Link>
                     <LeadStatusPill status={l.status} className="text-xs shrink-0" />
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground">No assigned leads</p>
+              <p className="text-sm text-muted-foreground py-4">No assigned leads</p>
             )}
           </SectionCard>
         )}

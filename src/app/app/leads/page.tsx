@@ -17,7 +17,14 @@ async function LeadsContent() {
   if (!demoEnabled && leads.length === 0) {
     return (
       <div className="space-y-6 sm:space-y-8">
-        <PageHeader title="Leads" subtitle="Manage your leads" />
+        <PageHeader
+          title="Leads"
+          subtitle="Manage your leads"
+          breadcrumbs={[
+            { label: "Home", href: "/app/dashboard" },
+            { label: "Leads" },
+          ]}
+        />
         <EmptyState
           icon={Users}
           title="No leads yet"
@@ -30,7 +37,14 @@ async function LeadsContent() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <PageHeader title="Leads" subtitle={`${leads.length} total leads`} />
+      <PageHeader
+        title="Leads"
+        subtitle={`${leads.length} total leads`}
+        breadcrumbs={[
+          { label: "Home", href: "/app/dashboard" },
+          { label: "Leads" },
+        ]}
+      />
       <LeadsDataList leads={leads} />
     </div>
   );

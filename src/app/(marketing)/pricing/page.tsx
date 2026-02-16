@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import { MarketingHeader } from "@/components/app/MarketingHeader";
 import { MarketingFooter } from "@/components/app/MarketingFooter";
+import { EarlyBirdBanner } from "@/components/app/EarlyBirdBanner";
 import { CONTAINER, PAGE_PADDING, TYPO } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
@@ -17,22 +18,22 @@ const plans: Array<{
   primary: boolean;
 }> = [
   {
-    name: "Starter",
+    name: "Essentials",
     price: "$99",
     period: "/mo",
     description: "For small real estate teams getting started.",
-    features: ["Up to 3 agents", "Lead routing", "SMS inbox"],
+    features: ["Up to 15 agents", "AI lead qualification", "Lead routing", "SMS inbox", "Seamless lead sync"],
     cta: "Start free trial",
     href: "/signup",
     primary: false,
   },
   {
-    name: "Growth",
+    name: "Pro",
     badge: "Popular",
     price: "$249",
     period: "/mo",
     description: "For growing teams that need more coverage.",
-    features: ["Up to 15 agents", "Everything in Starter", "Performance visibility"],
+    features: ["Unlimited agents", "Everything in Essentials", "Performance visibility", "Priority support"],
     cta: "Start free trial",
     href: "/signup",
     primary: true,
@@ -42,7 +43,7 @@ const plans: Array<{
     price: "Custom",
     period: "",
     description: "For larger brokerages and custom or flexible needs.",
-    features: ["Unlimited agents", "Everything in Growth", "Priority support"],
+    features: ["Unlimited agents", "Everything in Pro", "Dedicated support", "Custom options"],
     cta: "Contact sales",
     href: "/contact",
     primary: false,
@@ -60,6 +61,8 @@ export default function PricingPage() {
           <p className={cn(TYPO.muted, "mt-2")}>Choose the plan that fits your brokerage.</p>
           <p className={cn(TYPO.muted, "mt-1 text-sm")}>SMS-first lead response for real estate teams.</p>
         </div>
+
+        <EarlyBirdBanner className="mt-8" />
 
         <div className="mt-10 md:mt-12 grid gap-6 md:grid-cols-3">
           {plans.map((plan) => (

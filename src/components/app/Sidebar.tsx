@@ -2,36 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  MessageSquare,
-  UserCog,
-  Settings,
-  CreditCard,
-  Route,
-  User,
-} from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { getNavItemsForRole } from "@/lib/nav";
 import type { Role } from "@/lib/types";
-
-interface NavItem {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  roles: Role[];
-}
-
-const navItems: NavItem[] = [
-  { href: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["owner", "agent"] },
-  { href: "/app/leads", label: "Leads", icon: Users, roles: ["owner", "agent"] },
-  { href: "/app/messages", label: "Messages", icon: MessageSquare, roles: ["owner", "agent"] },
-  { href: "/app/agents", label: "Agents", icon: UserCog, roles: ["owner"] },
-  { href: "/app/routing", label: "Routing", icon: Route, roles: ["owner"] },
-  { href: "/app/billing", label: "Billing", icon: CreditCard, roles: ["owner"] },
-  { href: "/app/settings", label: "Settings", icon: Settings, roles: ["owner"] },
-  { href: "/app/account", label: "Account", icon: User, roles: ["owner", "agent"] },
-];
 
 interface SidebarProps {
   role: Role;
@@ -40,7 +15,7 @@ interface SidebarProps {
 
 export function Sidebar({ role, className }: SidebarProps) {
   const pathname = usePathname();
-  const filtered = navItems.filter((item) => item.roles.includes(role));
+  const groups = getNavItemsForRole(role);
 
   return (
     <aside
@@ -49,26 +24,50 @@ export function Sidebar({ role, className }: SidebarProps) {
         className
       )}
     >
-      <nav className="flex-1 p-4 space-y-1">
-        {filtered.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 p-4 space-y-4" aria-label="App navigation">
+        {groups.map((group, gi) => (
+          <div key={group.label}>
+            {gi > 0 && <Separator className="mb-4" />}
+            <p className="px-3 mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              {group.label}
+            </p>
+            <ul className="space-y-1">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  pathname === item.href || pathname.startsWith(item.href + "/");
+                const link = (
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {item.label}
+                  </Link>
+                );
+                return (
+                  <li key={item.href}>
+                    {item.tooltip ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>{link}</TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={8}>
+                          {item.tooltip}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      link
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </nav>
     </aside>
   );

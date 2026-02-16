@@ -7,6 +7,7 @@ import {
   getDemoInsights,
   appendMessage,
 } from "@/lib/demo/data";
+import { Breadcrumbs } from "@/components/app/Breadcrumbs";
 import { LeadStatusPill } from "@/components/app/LeadStatusPill";
 import { Timeline } from "@/components/app/Timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,14 @@ async function LeadDetailContent({ id }: { id: string }) {
 
   return (
     <div className="space-y-8">
+      <Breadcrumbs
+        segments={[
+          { label: "Home", href: "/app/dashboard" },
+          { label: "Leads", href: "/app/leads" },
+          { label: lead.name },
+        ]}
+        className="mb-2"
+      />
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{lead.name}</h1>

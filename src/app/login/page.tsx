@@ -1,103 +1,33 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Building2, User } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { CONTAINER_NARROW, TYPO } from "@/lib/ui";
+import { Suspense } from "react";
+import { LoginForm } from "@/components/app/LoginForm";
+import { CONTAINER_NARROW } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
-type Role = "owner" | "agent";
+function LoginFormFallback() {
+  return (
+    <div className="w-full max-w-md mx-auto animate-pulse">
+      <div className="h-8 w-48 mx-auto mb-8 bg-muted rounded" />
+      <div className="rounded-xl border bg-card p-6 shadow-lg space-y-4">
+        <div className="h-6 w-32 bg-muted rounded" />
+        <div className="h-10 w-full bg-muted rounded" />
+        <div className="h-10 w-full bg-muted rounded" />
+        <div className="h-11 w-full bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState<Role | null>(null);
-
-  async function handleContinue(role: Role) {
-    setLoading(role);
-    try {
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        toast.error(data.error?.message ?? "Something went wrong");
-        setLoading(null);
-        return;
-      }
-      toast.success("Welcome!");
-      router.push("/app/dashboard");
-      router.refresh();
-    } catch {
-      toast.error("Something went wrong");
-      setLoading(null);
-    }
-  }
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 px-4 py-12">
-      <div className={cn(CONTAINER_NARROW, "w-full")}>
-        <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-xl font-bold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
-          >
-            <Building2 className="size-6" aria-hidden />
-            LeadHandler.ai
-          </Link>
-        </div>
-
-        <Card className="border-primary/20 shadow-lg shadow-primary/5">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className={cn(TYPO.h1, "text-2xl")}>
-              Continue to app
-            </CardTitle>
-            <CardDescription className={cn(TYPO.muted, "mt-1")}>
-              Select your role to enter demo mode.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={() => handleContinue("owner")}
-              disabled={loading !== null}
-              className="w-full h-11"
-            >
-              <Building2 className="size-4" aria-hidden />
-              {loading === "owner" ? "Signing in…" : "Continue as Owner"}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => handleContinue("agent")}
-              disabled={loading !== null}
-              className="w-full h-11"
-            >
-              <User className="size-4" aria-hidden />
-              {loading === "agent" ? "Signing in…" : "Continue as Agent"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <p className={cn(TYPO.muted, "mt-6 text-center text-sm")}>
-          <Link
-            href="/"
-            className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
-          >
-            Back to home
-          </Link>
-        </p>
-      </div>
+    <div
+      className={cn(
+        "min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 px-4 py-12",
+        CONTAINER_NARROW
+      )}
+    >
+      <Suspense fallback={<LoginFormFallback />}>
+        <LoginForm />
+      </Suspense>
     </div>
   );
 }

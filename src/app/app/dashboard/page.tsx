@@ -186,6 +186,19 @@ async function DashboardContent() {
         ]}
       />
 
+      {demoEnabled && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="rounded-xl border-2 border-primary/20 bg-primary/5 p-4 shadow-sm">
+            <p className="text-sm font-medium text-muted-foreground">Avg Response Time</p>
+            <p className="text-2xl font-bold text-foreground mt-1">12s</p>
+          </div>
+          <div className="rounded-xl border-2 border-primary/20 bg-primary/5 p-4 shadow-sm">
+            <p className="text-sm font-medium text-muted-foreground">Leads Qualified</p>
+            <p className="text-2xl font-bold text-foreground mt-1">47</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         <Button asChild variant="outline" size="sm">
           <Link href="/app/leads" className="flex items-center gap-2">
@@ -240,7 +253,7 @@ async function DashboardContent() {
             items={activity}
             emptyMessage={
               !demoEnabled && leads.length === 0
-                ? "Connect Airtable in Settings to see activity."
+                ? "Connect your lead sources in Settings to see activity."
                 : "No recent activity—add a lead!"
             }
           />

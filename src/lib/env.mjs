@@ -17,6 +17,8 @@ const serverSchema = z.object({
     .default("true")
     .transform((v) => v === "true"),
   SESSION_SECRET: z.string().min(16).default("super-secret-for-demo-only-change-in-prod"),
+  /** Broker email allowed for dev/direct login (no real auth yet) */
+  DEV_ADMIN_EMAIL: z.string().default(""),
 });
 
 const clientSchema = z.object({
@@ -25,6 +27,8 @@ const clientSchema = z.object({
     z.string().url().default("http://localhost:3000")
   ),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().default(""),
+  /** Pre-fill login email in dev (e.g. presfv1@gmail.com) */
+  NEXT_PUBLIC_DEV_LOGIN_EMAIL: z.string().default(""),
 });
 
 function parseEnv() {
@@ -42,11 +46,13 @@ function parseEnv() {
     MAKE_WEBHOOK_URL: process.env.MAKE_WEBHOOK_URL,
     DEMO_MODE_DEFAULT: process.env.DEMO_MODE_DEFAULT ?? "true",
     SESSION_SECRET: process.env.SESSION_SECRET,
+    DEV_ADMIN_EMAIL: process.env.DEV_ADMIN_EMAIL,
   });
 
   const client = clientSchema.safeParse({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_DEV_LOGIN_EMAIL: process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL,
   });
 
   if (!server.success) {

@@ -56,13 +56,66 @@ export async function getDemoEnabled(request: NextRequest): Promise<boolean> {
   return env.server.DEMO_MODE_DEFAULT;
 }
 
-const loginSchema = z.object({
+const demoLoginSchema = z.object({
   role: z.enum(["owner", "agent"]),
   name: z.string().optional(),
 });
 
+const brokerLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1, "Password is required"),
+});
+
+function getAllowedBrokerEmail(): string {
+  const fromEnv = env.server.DEV_ADMIN_EMAIL?.trim();
+  return fromEnv || "presfv1@gmail.com";
+}
+
 export async function POST(request: NextRequest) {
-  const parsed = loginSchema.safeParse(await request.json());
+  const body = await request.json();
+
+  if (body.email != null && body.password != null) {
+    const parsed = brokerLoginSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: { code: "VALIDATION_ERROR", message: "Invalid email or password" } },
+        { status: 400 }
+      );
+    }
+    const { email } = parsed.data;
+    const allowedEmail = getAllowedBrokerEmail().toLowerCase();
+    if (allowedEmail === "" || email.toLowerCase().trim() !== allowedEmail) {
+      return NextResponse.json(
+        { success: false, error: { code: "UNAUTHORIZED", message: "Invalid email or password" } },
+        { status: 401 }
+      );
+    }
+    const userId = `broker-${Buffer.from(email).toString("base64url").slice(0, 24)}`;
+    const token = await signPayload({
+      userId,
+      role: "owner",
+      name: email.split("@")[0],
+      isDemo: false,
+    });
+    const res = NextResponse.json({ success: true, data: { redirect: "/app/dashboard" } });
+    res.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+    res.cookies.set(DEMO_COOKIE_NAME, "false", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+    return res;
+  }
+
+  const parsed = demoLoginSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { success: false, error: { code: "VALIDATION_ERROR", message: parsed.error.message } },
@@ -74,7 +127,7 @@ export async function POST(request: NextRequest) {
   const token = await signPayload({
     userId,
     role,
-    name: name ?? (role === "owner" ? "Demo Owner" : "Demo Agent"),
+    name: name ?? (role === "owner" ? "Demo Broker" : "Demo Agent"),
     isDemo: true,
   });
   const res = NextResponse.json({ success: true, data: { redirect: "/app/dashboard" } });

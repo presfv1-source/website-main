@@ -3,8 +3,12 @@ import { Building2, Zap, MessageSquare, Users, Shield, BarChart3 } from "lucide-
 import { Button } from "@/components/ui/button";
 import { MarketingHeader } from "@/components/app/MarketingHeader";
 import { MarketingFooter } from "@/components/app/MarketingFooter";
+import { HeroSection } from "@/components/app/HeroSection";
 import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
+
+/** Replace with your Loom embed URL (45s demo). Example: https://www.loom.com/embed/xxxxx */
+const LOOM_EMBED_URL = process.env.NEXT_PUBLIC_LOOM_EMBED_URL || "";
 
 export default function MarketingHomePage() {
   return (
@@ -12,33 +16,16 @@ export default function MarketingHomePage() {
       <MarketingHeader />
 
       <main>
-        <section className="py-24 px-4 md:px-8 bg-gradient-to-b from-primary/5 to-background dark:from-primary/10 dark:to-background">
-          <div className="container max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-              Turn new leads into conversations faster
-            </h1>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              AI-assisted SMS lead response and routing for real estate teams. Respond first, qualify with confidence, route to the right agent.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="text-base">
-                <Link href="/signup">Start free trial</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="text-base">
-                <Link href="/pricing">View pricing</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+        <HeroSection />
 
         <section className={cn(CONTAINER, PAGE_PADDING, "py-12 max-w-5xl mx-auto")}>
           <p className="text-center text-sm text-muted-foreground mb-6">Built for fast-moving teams</p>
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            <span className="text-sm font-medium text-muted-foreground/80">Airtable</span>
+            <span className="text-sm font-medium text-muted-foreground/80">Seamless lead sync</span>
             <span className="text-muted-foreground/40">·</span>
-            <span className="text-sm font-medium text-muted-foreground/80">Twilio</span>
+            <span className="text-sm font-medium text-muted-foreground/80">SMS inbox</span>
             <span className="text-muted-foreground/40">·</span>
-            <span className="text-sm font-medium text-muted-foreground/80">Stripe</span>
+            <span className="text-sm font-medium text-muted-foreground/80">Simple billing</span>
           </div>
         </section>
 
@@ -68,20 +55,30 @@ export default function MarketingHomePage() {
 
         <section className={cn(CONTAINER, PAGE_PADDING, "py-24 bg-muted/30 max-w-5xl mx-auto")}>
             <h2 className="text-3xl font-bold text-center mb-12">How it works</h2>
+            {LOOM_EMBED_URL ? (
+              <div className="mb-14 rounded-xl overflow-hidden border bg-card shadow-sm aspect-video max-w-3xl mx-auto">
+                <iframe
+                  src={LOOM_EMBED_URL}
+                  allowFullScreen
+                  className="w-full h-full"
+                  title="LeadHandler demo video"
+                />
+              </div>
+            ) : null}
             <div className="grid md:grid-cols-3 gap-12">
               <div className="text-center">
                 <div className="inline-flex h-12 w-12 rounded-full bg-primary/10 items-center justify-center mb-4">
                   <Users className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Capture leads</h3>
-                <p className="text-muted-foreground text-sm">Connect your lead sources (e.g. via Airtable and automations). Leads flow in when configured.</p>
+                <p className="text-muted-foreground text-sm">Connect your lead sources. Leads flow in and sync to your dashboard.</p>
               </div>
               <div className="text-center">
                 <div className="inline-flex h-12 w-12 rounded-full bg-primary/10 items-center justify-center mb-4">
                   <MessageSquare className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Respond quickly</h3>
-                <p className="text-muted-foreground text-sm">Respond from one inbox. Keep every conversation in one place so you don&apos;t miss a lead.</p>
+                <p className="text-muted-foreground text-sm">One inbox for every conversation. Never miss a lead.</p>
               </div>
               <div className="text-center">
                 <div className="inline-flex h-12 w-12 rounded-full bg-primary/10 items-center justify-center mb-4">
@@ -113,8 +110,8 @@ export default function MarketingHomePage() {
               </div>
               <div className="rounded-xl border p-6">
                 <Building2 className="h-8 w-8 text-primary mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Airtable sync</h3>
-                <p className="text-muted-foreground text-sm">Keep your base as the source of truth. Real-time sync.</p>
+                <h3 className="font-semibold text-lg mb-2">Seamless lead sync</h3>
+                <p className="text-muted-foreground text-sm">Your leads stay in sync. One source of truth, real-time.</p>
               </div>
             </div>
         </section>

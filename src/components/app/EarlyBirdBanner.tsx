@@ -38,23 +38,24 @@ export function EarlyBirdBanner({ className }: EarlyBirdBannerProps) {
     <div
       role="banner"
       className={cn(
-        "relative flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 pr-12 text-sm",
+        "relative flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-600/30 bg-blue-600 px-4 py-3 pr-12 text-sm text-white shadow-sm",
         className
       )}
     >
-      <span>
-        <strong>Beta:</strong> Lock in $99/mo—limited spots.{" "}
+      <p className="font-bold">
+        Limited Beta: Lock $99/mo Essentials or $249/mo Pro—spots filling!
+        <span className="font-normal opacity-95"> Includes 14-day trial, no card.</span>{" "}
         <Link
-          href="/pricing"
-          className="font-medium text-primary underline underline-offset-2 hover:no-underline"
+          href="/signup"
+          className="inline-flex items-center font-semibold underline underline-offset-2 hover:no-underline"
         >
-          View pricing
+          Claim Beta Spot →
         </Link>
-      </span>
+      </p>
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-white hover:bg-white/20 hover:text-white"
         onClick={handleDismiss}
         aria-label="Dismiss banner"
       >

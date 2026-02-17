@@ -334,6 +334,36 @@ export async function createAirtableUser(
   }
 }
 
+/** Update a user's role in the Users table. Returns true if updated. */
+export async function updateUserRole(email: string, role: ValidRole): Promise<boolean> {
+  const table = env.server.AIRTABLE_TABLE_USERS?.trim();
+  if (!table || !hasAirtable) return false;
+  const trimmed = email.trim().toLowerCase();
+  if (!trimmed) return false;
+  const escaped = trimmed.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const formula = `LOWER({Email}) = "${escaped}"`;
+  try {
+    const records = await listAllRecords<UserFields>(table, formula);
+    const recordId = records[0]?.id;
+    if (!recordId) return false;
+    const url = `${tableUrl(table)}/${recordId}`;
+    const res = await fetch(url, {
+      method: "PATCH",
+      headers: getHeaders(),
+      body: JSON.stringify({ fields: { Role: role } }),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      if (res.status === 401) throw new AirtableAuthError(`Airtable Users update: 401`);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    if (e instanceof AirtableAuthError) throw e;
+    return false;
+  }
+}
+
 /** Resolve Airtable Agent record id by email (from Agents table). Used when Users table has no Agent link. */
 export async function getAgentIdByEmail(email: string): Promise<string | null> {
   if (!hasAirtable) return null;

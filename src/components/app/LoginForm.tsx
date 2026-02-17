@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Building2, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -25,14 +25,28 @@ const DEV_EMAIL =
     ? process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL.trim()
     : "presfv1@gmail.com";
 
-const CALLBACK_URL = "/app/dashboard";
+const DEFAULT_CALLBACK = "/app/dashboard";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl")?.trim() || DEFAULT_CALLBACK;
   const [email, setEmail] = useState(DEV_EMAIL);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    const code = searchParams.get("code");
+    if (code === "AccountNotFound") {
+      toast.error("Account not found — contact support.");
+      return;
+    }
+    if (error === "OAuthAccountNotLinked" || error === "OAuthCallback" || error === "Callback" || error === "OAuthCreateAccount") {
+      toast.error("OAuth failed. Try again or use email/password.");
+    }
+  }, [searchParams]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -41,25 +55,40 @@ export function LoginForm() {
       const res = await signIn("credentials", {
         email: email.trim(),
         password,
-        callbackUrl: CALLBACK_URL,
+        callbackUrl,
         redirect: false,
       });
-      if (res?.error || !res?.ok) {
-        toast.error("Invalid email or password");
-        setLoading(false);
+      if (res?.error || res?.status === 401 || !res?.ok) {
+        let message = "Invalid email or password.";
+        if (res?.url) {
+          try {
+            const u = new URL(res.url, window.location.origin);
+            if (u.searchParams.get("code") === "AccountNotFound") message = "Account not found — contact support.";
+          } catch {
+            // ignore
+          }
+        }
+        toast.error(message);
         return;
       }
       toast.success("Welcome back!");
-      router.push(CALLBACK_URL);
-      router.refresh();
+      const url = res?.url ?? callbackUrl;
+      window.location.href = url;
     } catch {
       toast.error("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
     }
   }
 
   async function handleOAuth(provider: "google" | "apple") {
-    await signIn(provider, { callbackUrl: CALLBACK_URL });
+    setLoading(true);
+    try {
+      await signIn(provider, { callbackUrl });
+    } catch {
+      toast.error("OAuth failed");
+      setLoading(false);
+    }
   }
 
   return (

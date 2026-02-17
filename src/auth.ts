@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Apple from "next-auth/providers/apple";
 import Credentials from "next-auth/providers/credentials";
+import { CredentialsSignin } from "next-auth";
 import { compareSync } from "bcryptjs";
 import { env } from "@/lib/env.mjs";
 import {
@@ -12,9 +13,14 @@ import {
 } from "@/lib/airtable";
 import type { Role } from "@/lib/types";
 
-function getAllowedBrokerEmail(): string {
+function getDevAdminEmail(): string {
   const fromEnv = env.server.DEV_ADMIN_EMAIL?.trim();
   return fromEnv || "presfv1@gmail.com";
+}
+
+const secret = env.server.NEXTAUTH_SECRET?.trim() || process.env.AUTH_SECRET?.trim();
+if (process.env.NODE_ENV === "production" && !secret) {
+  throw new Error("AUTH_SECRET or NEXTAUTH_SECRET is required in production");
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -44,59 +50,51 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = credentials?.email?.toString()?.trim();
         const password = credentials?.password?.toString();
         if (!email) return null;
+
         const emailLower = email.toLowerCase();
-        const allowedBroker = getAllowedBrokerEmail().toLowerCase();
+        const devAdmin = getDevAdminEmail().toLowerCase();
 
         try {
-          const airtableUser = await getAirtableUserByEmailForAuth(email);
-          if (airtableUser) {
-            if (airtableUser.passwordHash) {
-              if (!password || !compareSync(password, airtableUser.passwordHash)) {
-                return null;
-              }
-            } else if (emailLower !== allowedBroker) {
-              return null;
+          let airtableUser = await getAirtableUserByEmailForAuth(email);
+
+          if (!airtableUser) {
+            if (emailLower === devAdmin) {
+              const created = await createAirtableUser(email, "owner");
+              if (!created) return null;
+              airtableUser = { role: "owner" as const, agentId: undefined, passwordHash: undefined };
+            } else {
+              const err = new CredentialsSignin("Account not found");
+              err.code = "AccountNotFound";
+              throw err;
             }
-            let agentId = airtableUser.agentId;
-            if (airtableUser.role === "agent" && !agentId) {
-              const resolved = await getAgentIdByEmail(email);
-              if (resolved) agentId = resolved;
-            }
-            const userId =
-              airtableUser.role === "agent"
-                ? `agent-${Buffer.from(email).toString("base64url").slice(0, 24)}`
-                : `${airtableUser.role}-${Buffer.from(email).toString("base64url").slice(0, 24)}`;
-            return {
-              id: userId,
-              email,
-              name: email.split("@")[0],
-              role: airtableUser.role,
-              agentId: agentId ?? undefined,
-            };
           }
-          if (allowedBroker && emailLower === allowedBroker) {
-            const userId = `owner-${Buffer.from(email).toString("base64url").slice(0, 24)}`;
-            return {
-              id: userId,
-              email,
-              name: email.split("@")[0],
-              role: "owner" as Role,
-              agentId: undefined,
-            };
+
+          if (airtableUser.passwordHash) {
+            if (!password || !compareSync(password, airtableUser.passwordHash)) return null;
+          } else if (emailLower !== devAdmin) {
+            return null;
           }
-        } catch {
-          if (allowedBroker && emailLower === allowedBroker) {
-            const userId = `owner-${Buffer.from(email).toString("base64url").slice(0, 24)}`;
-            return {
-              id: userId,
-              email,
-              name: email.split("@")[0],
-              role: "owner" as Role,
-              agentId: undefined,
-            };
+
+          let agentId = airtableUser.agentId;
+          if (airtableUser.role === "agent" && !agentId) {
+            const resolved = await getAgentIdByEmail(email);
+            if (resolved) agentId = resolved;
           }
+          const userId =
+            airtableUser.role === "agent"
+              ? `agent-${Buffer.from(email).toString("base64url").slice(0, 24)}`
+              : `${airtableUser.role}-${Buffer.from(email).toString("base64url").slice(0, 24)}`;
+          return {
+            id: userId,
+            email,
+            name: email.split("@")[0],
+            role: airtableUser.role,
+            agentId: agentId ?? undefined,
+          };
+        } catch (e) {
+          if (e instanceof CredentialsSignin) throw e;
+          return null;
         }
-        return null;
       },
     }),
   ],
@@ -106,7 +104,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = user.email?.trim();
         if (!email) return false;
         const emailLower = email.toLowerCase();
-        const allowedBroker = getAllowedBrokerEmail().toLowerCase();
+        const allowedBroker = getDevAdminEmail().toLowerCase();
         try {
           let airtableUser = await getAirtableUserByEmail(email);
           if (!airtableUser) {
@@ -152,8 +150,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
-  secret: env.server.NEXTAUTH_SECRET || env.server.SESSION_SECRET,
+  secret: secret || env.server.SESSION_SECRET,
   trustHost: true,
 });

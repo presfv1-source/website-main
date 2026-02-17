@@ -41,6 +41,14 @@ const clientSchema = z.object({
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().default(""),
   /** Pre-fill login email in dev (e.g. presfv1@gmail.com) */
   NEXT_PUBLIC_DEV_LOGIN_EMAIL: z.string().default(""),
+  /** Firebase (client config; safe to expose, restrict in Firebase Console) */
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string().default(""),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().default(""),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().default(""),
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string().default(""),
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().default(""),
+  NEXT_PUBLIC_FIREBASE_APP_ID: z.string().default(""),
+  NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: z.string().default(""),
 });
 
 function parseEnv() {
@@ -72,6 +80,13 @@ function parseEnv() {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_DEV_LOGIN_EMAIL: process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL,
+    NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   });
 
   if (!server.success) {

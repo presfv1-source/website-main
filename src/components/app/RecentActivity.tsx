@@ -2,42 +2,68 @@
 
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { Inbox, MessageSquare, CalendarCheck } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { ActivityItem } from "@/lib/types";
+import { TYPO } from "@/lib/ui";
 
-const BADGE_BY_TYPE: Record<
+const TYPE_META: Record<
   ActivityItem["type"],
-  { label: string; variant: "default" | "secondary" | "outline" }
+  { emoji: string; label: string }
 > = {
-  lead_created: { label: "New lead", variant: "default" },
-  message_sent: { label: "Replied", variant: "default" },
-  message_received: { label: "Message", variant: "secondary" },
-  status_changed: { label: "Status", variant: "outline" },
-  lead_assigned: { label: "Assigned", variant: "default" },
+  lead_created: { emoji: "📥", label: "New lead" },
+  message_sent: { emoji: "💬", label: "Replied" },
+  message_received: { emoji: "💬", label: "Message" },
+  status_changed: { emoji: "📅", label: "Status" },
+  lead_assigned: { emoji: "📥", label: "Assigned" },
 };
 
-const ICON_BY_TYPE: Record<ActivityItem["type"], typeof Inbox> = {
-  lead_created: Inbox,
-  message_sent: MessageSquare,
-  message_received: MessageSquare,
-  status_changed: CalendarCheck,
-  lead_assigned: Inbox,
-};
-
-const ICON_CLASS_BY_TYPE: Record<ActivityItem["type"], string> = {
-  lead_created: "text-primary",
-  message_sent: "text-emerald-600",
-  message_received: "text-muted-foreground",
-  status_changed: "text-amber-500",
-  lead_assigned: "text-primary",
-};
+const demoData: ActivityItem[] = [
+  {
+    id: "demo-1",
+    type: "lead_created",
+    title: "Lead added",
+    description: "Website",
+    leadId: "8",
+    leadName: "Sarah",
+    createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-2",
+    type: "message_sent",
+    title: "Message sent",
+    description: "Wednesday at 2pm works",
+    leadId: "3",
+    leadName: "James R.",
+    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-3",
+    type: "status_changed",
+    title: "Status updated",
+    description: "Maria S. set to Appointment",
+    leadId: "2",
+    leadName: "Maria S.",
+    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-4",
+    type: "message_received",
+    title: "Message received",
+    description: "Hi, looking for home in Houston",
+    leadId: "4",
+    leadName: "Lisa C.",
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "demo-5",
+    type: "lead_created",
+    title: "Lead added",
+    description: "Zillow",
+    leadId: "5",
+    leadName: "Robert M.",
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
 
 function getActionText(item: ActivityItem): string {
   if (item.type === "lead_created") return `New lead from ${item.leadName ?? "inbound"}`;
@@ -48,20 +74,8 @@ function getActionText(item: ActivityItem): string {
   return item.title;
 }
 
-function getDetailsFull(item: ActivityItem): string {
-  const parts: string[] = [];
-  if (item.description) parts.push(item.description);
-  if (item.leadName && !getActionText(item).includes(item.leadName)) parts.push(item.leadName);
-  return parts.join(" — ");
-}
-
-function getDetailsTruncated(item: ActivityItem, maxLen = 120): string {
-  const full = getDetailsFull(item);
-  return full.length > maxLen ? full.slice(0, maxLen) + "…" : full;
-}
-
 interface RecentActivityProps {
-  items: ActivityItem[];
+  items?: ActivityItem[];
   className?: string;
   emptyMessage?: string;
 }
@@ -71,9 +85,11 @@ export function RecentActivity({
   className,
   emptyMessage = "No recent activity—add a lead!",
 }: RecentActivityProps) {
-  if (items.length === 0) {
+  const list = (items?.length ? items : demoData).slice(0, 20);
+
+  if (list.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground py-6" role="status">
+      <p className={cn(TYPO.muted, "py-6")} role="status">
         {emptyMessage}
       </p>
     );
@@ -81,59 +97,48 @@ export function RecentActivity({
 
   return (
     <div className={cn("relative min-w-0", className)}>
-      <ul className="flex flex-col gap-3" aria-label="Recent activity">
-        {items.map((item) => {
-          const badge = BADGE_BY_TYPE[item.type];
-          const Icon = ICON_BY_TYPE[item.type];
-          const iconClass = ICON_CLASS_BY_TYPE[item.type];
-          const detailsShort = getDetailsTruncated(item);
-          const detailsFull = getDetailsFull(item);
+      <ul className="flex flex-col gap-3 min-w-0" aria-label="Recent activity">
+        {list.map((item) => {
+          const meta = TYPE_META[item.type];
           const actionText = getActionText(item);
 
           return (
             <li
               key={item.id}
               className={cn(
-                "flex items-center gap-3 rounded-lg border border-border/60 bg-slate-50 dark:bg-slate-900/40 px-4 py-3",
-                "transition-[transform,box-shadow] duration-200 ease-out",
-                "hover:-translate-y-0.5 hover:shadow-md"
+                "flex items-center gap-3 rounded-lg border border-border border-l-4 border-l-orange-600 bg-card shadow-sm px-4 py-3",
+                "transition-all duration-200 ease-out",
+                "hover:-translate-y-0.5 hover:shadow-md hover:border-orange-500"
               )}
             >
-              <span className={cn("shrink-0", iconClass)} aria-hidden>
-                <Icon className="h-5 w-5" />
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 dark:bg-orange-950/40 text-lg"
+                aria-hidden
+              >
+                {meta.emoji}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-foreground">
+                <p className={cn(TYPO.bodySmall, "font-semibold text-foreground")}>
                   {item.leadId ? (
                     <Link
                       href={`/app/leads/${item.leadId}`}
-                      className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                      className="text-orange-600 dark:text-orange-500 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded py-2 -my-2 px-1 -mx-1 inline-flex items-center"
                     >
                       {item.leadName ?? "Lead"}
                     </Link>
                   ) : (
                     <span>{item.leadName ?? "Lead"}</span>
                   )}{" "}
-                  <Badge variant={badge.variant} className="ml-1.5 text-xs">
-                    {badge.label}
-                  </Badge>
+                  <span className="ml-1.5 text-xs font-normal text-orange-600 dark:text-orange-500">
+                    {meta.label}
+                  </span>
                 </p>
-                <p className="text-sm text-foreground mt-0.5">{actionText}</p>
-                <p className="text-xs text-muted-foreground mt-1 tabular-nums">
+                <p className={cn(TYPO.bodySmall, "text-foreground mt-0.5 truncate")}>
+                  {actionText}
+                </p>
+                <p className={cn(TYPO.mutedSmall, "mt-1 tabular-nums")}>
                   {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
                 </p>
-                {detailsFull ? (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-full cursor-help">
-                        {detailsShort}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-xs">
-                      {detailsFull}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : null}
               </div>
             </li>
           );

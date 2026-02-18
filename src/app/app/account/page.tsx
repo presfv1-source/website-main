@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ function setStoredBool(key: string, value: boolean) {
 
 export default function AccountPage() {
   const router = useRouter();
+  const { signOut } = useClerk();
   const [session, setSession] = useState<{
     name?: string;
     role: string;
@@ -70,7 +72,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/auth/firebase/session", { credentials: "include" }).then((r) => r.json()),
+      fetch("/api/auth/session", { credentials: "include" }).then((r) => r.json()),
       fetch("/api/demo/state", { credentials: "include" }).then((r) => r.json()),
     ]).then(([sessionRes, demoRes]) => {
       if (sessionRes.success && sessionRes.data) {
@@ -103,9 +105,8 @@ export default function AccountPage() {
   }, []);
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     toast.success("You have been logged out");
-    window.location.href = "/login";
+    await signOut({ redirectUrl: "/login" });
   }
 
   async function handleDemoToggle(checked: boolean) {
@@ -145,7 +146,7 @@ export default function AccountPage() {
 
   function handleNameSave() {
     if (editName.trim() === (session?.name ?? "").trim()) return;
-    fetch("/api/auth/firebase/session", {
+    fetch("/api/auth/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

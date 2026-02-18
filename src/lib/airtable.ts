@@ -424,6 +424,46 @@ export async function updateAirtableUserPlan(email: string, planId: string): Pro
   }
 }
 
+// ---- Waitlist ----
+/** Create a waitlist entry. When Airtable is not configured, logs and returns mock id. */
+export async function createWaitlistEntry(
+  email: string,
+  name?: string,
+  source?: string
+): Promise<{ id: string }> {
+  const trimmed = email.trim().toLowerCase();
+  if (!trimmed) throw new Error("Email is required");
+
+  if (!hasAirtable) {
+    console.log("[waitlist] (no Airtable)", { email: trimmed, name, source });
+    return { id: `waitlist-mock-${Date.now()}` };
+  }
+
+  const table = env.server.AIRTABLE_TABLE_WAITLIST?.trim() || "Waitlist";
+  const url = tableUrl(table);
+  const fields: Record<string, string> = { Email: trimmed };
+  if (name?.trim()) fields.Name = name.trim();
+  if (source?.trim()) fields.Source = source.trim();
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ fields }),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    if (res.status === 401) {
+      console.error("[airtable] AUTHENTICATION_REQUIRED createWaitlistEntry", err);
+      throw new AirtableAuthError(`Airtable Waitlist: 401 ${err}`);
+    }
+    console.error("[airtable] createWaitlistEntry failed:", res.status, err);
+    throw new Error(`Airtable Waitlist: ${res.status} ${err}`);
+  }
+  const created = (await res.json()) as { id: string };
+  return { id: created.id };
+}
+
 // ---- Messages ----
 // Expected fields: Body, Direction ("in" | "out" or "In" | "Out"), Lead (link to Leads).
 // createdTime on record or field "Created".

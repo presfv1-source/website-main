@@ -1,8 +1,13 @@
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { env } from "./env.mjs";
 import type { Role } from "./types";
+import {
+  getAirtableUserByEmail,
+  createAirtableUser,
+  getAgentIdByEmail,
+} from "./airtable";
 
 export interface Session {
   userId: string;
@@ -14,70 +19,103 @@ export interface Session {
   agentId?: string;
 }
 
-const SESSION_COOKIE_NAME = "lh_session";
 const VIEW_AS_COOKIE = "lh_view_as";
 const VALID_VIEW_AS = ["owner", "broker", "agent"] as const;
 const OVERRIDE_COOKIE = "lh_session_override";
 
-function getSessionSecret(): string {
-  return (
-    env.server.AUTH_SECRET?.trim() ||
-    env.server.NEXTAUTH_SECRET?.trim() ||
-    env.server.SESSION_SECRET ||
-    ""
-  );
+type ValidRole = "owner" | "broker" | "agent";
+
+function toRole(raw: unknown): Role {
+  if (raw === "owner" || raw === "broker" || raw === "agent") return raw;
+  return "broker";
 }
 
-type SessionPayload = { email?: string; role?: string; uid?: string; agentId?: string };
+async function syncRoleToClerk(userId: string, email: string): Promise<{
+  role: ValidRole;
+  agentId?: string;
+}> {
+  let role: ValidRole = "broker";
+  let airtableUser = await getAirtableUserByEmail(email);
+  const devAdmin = env.server.DEV_ADMIN_EMAIL?.trim().toLowerCase();
+  if (!airtableUser) {
+    role = email.toLowerCase() === devAdmin ? "owner" : "broker";
+    airtableUser = await createAirtableUser(email, role);
+    if (airtableUser) role = airtableUser.role;
+  } else {
+    role = airtableUser.role;
+  }
+  let agentId = airtableUser?.agentId;
+  if (role === "agent" && !agentId) {
+    agentId = (await getAgentIdByEmail(email)) ?? undefined;
+  }
+  try {
+    const client = await clerkClient();
+    await client.users.updateUser(userId, {
+      publicMetadata: { role, ...(agentId != null && { agentId }) },
+    });
+  } catch (e) {
+    console.error("[auth] Failed to sync role to Clerk:", e instanceof Error ? e.message : e);
+  }
+  return { role, agentId };
+}
 
 export async function getSession(): Promise<Session | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  const secret = getSessionSecret();
-  if (!token || secret.length < 16) return null;
+  const { userId } = await auth();
+  if (!userId) return null;
 
-  try {
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(secret)
-    );
-    const p = payload as SessionPayload;
-    const role = (p.role === "owner" || p.role === "broker" || p.role === "agent" ? p.role : "broker") as Role;
-    const viewAsRaw = cookieStore.get(VIEW_AS_COOKIE)?.value?.toLowerCase();
-    const effectiveRole: Role =
-      role === "owner" && viewAsRaw && VALID_VIEW_AS.includes(viewAsRaw as Role)
-        ? (viewAsRaw as Role)
-        : role;
+  const user = await currentUser();
+  if (!user) return null;
 
-    const override = cookieStore.get(OVERRIDE_COOKIE)?.value;
-    let name: string | undefined;
-    if (override?.trim()) {
-      try {
-        const parsed = JSON.parse(override) as { name?: string };
-        name = typeof parsed.name === "string" ? parsed.name.trim() : undefined;
-      } catch {
-        // ignore
-      }
-    }
-    name = name ?? (p.email ? p.email.split("@")[0] : undefined);
+  const email =
+    user.primaryEmailAddress?.emailAddress?.trim() ??
+    user.emailAddresses?.[0]?.emailAddress?.trim();
+  const meta = user.publicMetadata as { role?: string; agentId?: string } | undefined;
+  let role: Role = toRole(meta?.role);
+  let agentId: string | undefined =
+    typeof meta?.agentId === "string" ? meta.agentId : undefined;
 
-    const demoCookie = cookieStore.get("lh_demo")?.value;
-    const isDemo =
-      role === "owner" &&
-      (demoCookie === "true" || (demoCookie !== "false" && env.server.DEMO_MODE_DEFAULT));
-
-    return {
-      userId: p.uid ?? "",
-      role,
-      effectiveRole,
-      name,
-      email: p.email,
-      isDemo,
-      agentId: p.agentId,
-    };
-  } catch {
-    return null;
+  if (meta?.role !== "owner" && meta?.role !== "broker" && meta?.role !== "agent" && email) {
+    const synced = await syncRoleToClerk(userId, email);
+    role = synced.role;
+    agentId = synced.agentId;
   }
+
+  const cookieStore = await cookies();
+  const viewAsRaw = cookieStore.get(VIEW_AS_COOKIE)?.value?.toLowerCase();
+  const effectiveRole: Role =
+    role === "owner" && viewAsRaw && VALID_VIEW_AS.includes(viewAsRaw as Role)
+      ? (viewAsRaw as Role)
+      : role;
+
+  let name: string | undefined;
+  const override = cookieStore.get(OVERRIDE_COOKIE)?.value;
+  if (override?.trim()) {
+    try {
+      const parsed = JSON.parse(override) as { name?: string };
+      name = typeof parsed.name === "string" ? parsed.name.trim() : undefined;
+    } catch {
+      // ignore
+    }
+  }
+  name =
+    name ??
+    ([user.firstName, user.lastName].filter(Boolean).join(" ")?.trim() ||
+      (email ? email.split("@")[0] : undefined));
+
+  const demoCookie = cookieStore.get("lh_demo")?.value;
+  const isDemo =
+    role === "owner" &&
+    (demoCookie === "true" || (demoCookie !== "false" && env.server.DEMO_MODE_DEFAULT));
+
+  return {
+    userId,
+    role,
+    effectiveRole,
+    name,
+    email: email ?? undefined,
+    isDemo,
+    agentId,
+  };
 }
 
 export async function getDemoEnabled(session?: Session | null): Promise<boolean> {

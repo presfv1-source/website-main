@@ -38,22 +38,22 @@ export function HeroSection() {
   return (
     <section className="relative py-20 md:py-28 px-4 md:px-8 overflow-hidden">
       <div
-        className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-emerald-500/5"
+        className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-burnt-orange/5"
         aria-hidden
       />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,var(--primary)/8%,transparent)]" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_60%,var(--burnt-orange)/6%,transparent)]" aria-hidden />
 
       <div className="relative container max-w-5xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-foreground">
-            Turn new leads into conversations faster
+            Respond first. <span className="underline decoration-burnt-orange/60 decoration-2 underline-offset-4">Close more.</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-10">
-            AI-powered SMS lead response and routing for real estate teams.
-            Respond first, qualify with confidence, route to the right agent.
+            Speed-to-lead wins listings. Texas broker-owners use LeadHandler to reply in minutes, qualify with AI, and route every lead to the right agent—from one inbox.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="text-base min-h-[44px]">
+            <Button asChild size="lg" className="text-base min-h-[44px] hover:ring-2 hover:ring-burnt-orange/40 hover:ring-offset-2">
               <Link href="/login">Try demo</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="text-base min-h-[44px]">

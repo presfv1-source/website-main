@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -13,6 +14,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const BETA_PLANS = [
@@ -87,11 +105,117 @@ const COMPARISON_ROWS = [
   { feature: "Priority support", essentials: "—", pro: "✓" },
 ];
 
+const AGENT_RANGES = [
+  { value: "1-5", label: "1–5 agents" },
+  { value: "6-15", label: "6–15 agents" },
+  { value: "16-40", label: "16–40 agents" },
+  { value: "40+", label: "40+ agents" },
+] as const;
+
 export function PricingSection() {
   const [annual, setAnnual] = useState(false);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [waitlistName, setWaitlistName] = useState("");
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistBrokerage, setWaitlistBrokerage] = useState("");
+  const [waitlistAgents, setWaitlistAgents] = useState<string>("");
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+
+  async function handleWaitlistSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!waitlistName.trim() || !waitlistEmail.trim() || !waitlistBrokerage.trim() || !waitlistAgents) return;
+    setWaitlistLoading(true);
+    try {
+      const message = `Beta waitlist\nBrokerage: ${waitlistBrokerage.trim()}\nNumber of agents: ${waitlistAgents}`;
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: waitlistName.trim(), email: waitlistEmail.trim(), message }),
+      });
+      if (!res.ok) throw new Error("Failed to submit");
+      toast.success("Thanks! We'll be in touch soon.");
+      setWaitlistOpen(false);
+      setWaitlistName("");
+      setWaitlistEmail("");
+      setWaitlistBrokerage("");
+      setWaitlistAgents("");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setWaitlistLoading(false);
+    }
+  }
 
   return (
-    <Tabs defaultValue="beta" className="w-full">
+    <>
+      <Dialog open={waitlistOpen} onOpenChange={setWaitlistOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Join the beta waitlist</DialogTitle>
+            <DialogDescription>
+              Enter your details and we&apos;ll get you on the list for early access.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleWaitlistSubmit} className="grid gap-4">
+            <div>
+              <Label htmlFor="waitlist-name">Name</Label>
+              <Input
+                id="waitlist-name"
+                type="text"
+                value={waitlistName}
+                onChange={(e) => setWaitlistName(e.target.value)}
+                placeholder="Your name"
+                required
+                className="mt-1.5 min-h-[44px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="waitlist-email">Email</Label>
+              <Input
+                id="waitlist-email"
+                type="email"
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                placeholder="you@brokerage.com"
+                required
+                className="mt-1.5 min-h-[44px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="waitlist-brokerage">Brokerage</Label>
+              <Input
+                id="waitlist-brokerage"
+                type="text"
+                value={waitlistBrokerage}
+                onChange={(e) => setWaitlistBrokerage(e.target.value)}
+                placeholder="Brokerage name"
+                required
+                className="mt-1.5 min-h-[44px]"
+              />
+            </div>
+            <div>
+              <Label>Number of agents</Label>
+              <Select value={waitlistAgents} onValueChange={setWaitlistAgents}>
+                <SelectTrigger className="mt-1.5 w-full min-h-[44px]">
+                  <SelectValue placeholder="Select range" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AGENT_RANGES.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" disabled={waitlistLoading} className="min-h-[44px]">
+              {waitlistLoading ? "Submitting…" : "Submit"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Tabs defaultValue="beta" className="w-full">
       <TabsList className="mb-8 grid w-full max-w-md mx-auto grid-cols-2">
         <TabsTrigger value="beta">Beta Pricing</TabsTrigger>
         <TabsTrigger value="standard">Standard</TabsTrigger>
@@ -166,18 +290,19 @@ export function PricingSection() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={plan.href}
+                <Button
+                  type="button"
+                  onClick={() => setWaitlistOpen(true)}
                   className={cn(
-                    "mt-6 flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    "mt-6 w-full min-h-[44px]",
                     plan.primary
                       ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "border border-border bg-background hover:bg-muted"
+                      : "border border-border bg-background hover:bg-muted text-foreground"
                   )}
                 >
                   {plan.cta}
                   <ArrowRight className="size-4" aria-hidden />
-                </Link>
+                </Button>
               </CardContent>
             </Card>
             );
@@ -192,6 +317,7 @@ export function PricingSection() {
             </p>
           </CardHeader>
           <CardContent>
+            <div className="overflow-x-auto -mx-1">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -214,14 +340,16 @@ export function PricingSection() {
                 ))}
               </TableBody>
             </Table>
+            </div>
             <div className="mt-6 text-center">
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+              <Button
+                type="button"
+                onClick={() => setWaitlistOpen(true)}
+                className="min-h-[44px] inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
               >
                 Claim Beta Spot
                 <ArrowRight className="size-4" aria-hidden />
-              </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -281,5 +409,6 @@ export function PricingSection() {
         </div>
       </TabsContent>
     </Tabs>
+    </>
   );
 }

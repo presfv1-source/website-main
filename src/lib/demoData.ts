@@ -7,17 +7,19 @@ import type { Lead, Agent, Message, DashboardStats, ActivityItem } from "@/lib/t
 
 export const demoLeads: { id: string; name: string; phone: string; source: string; status: Lead["status"]; created: string; lastMessage: string }[] = [
   { id: "1", name: "John Doe", phone: "+17135551234", source: "Zillow", status: "qualified", created: "2026-02-15", lastMessage: "Interested in 3BR Heights" },
-  { id: "2", name: "Maria Santos", phone: "+17135551235", source: "Realtor.com", status: "contacted", created: "2026-02-15", lastMessage: "When can we tour?" },
+  { id: "2", name: "Maria Santos", phone: "+17135551235", source: "Realtor.com", status: "qualified", created: "2026-02-15", lastMessage: "When can we tour?" },
   { id: "3", name: "James Wilson", phone: "+17135551236", source: "Zillow", status: "appointment", created: "2026-02-14", lastMessage: "Wednesday at 2pm works" },
   { id: "4", name: "Lisa Chen", phone: "+17135551237", source: "Website", status: "new", created: "2026-02-16", lastMessage: "Hi, looking for home in Houston" },
   { id: "5", name: "Robert Martinez", phone: "+17135551238", source: "Zillow", status: "qualified", created: "2026-02-13", lastMessage: "Budget around 450k" },
   { id: "6", name: "Amanda Foster", phone: "+17135551239", source: "Realtor.com", status: "closed", created: "2026-02-10", lastMessage: "Thanks for everything!" },
-  { id: "7", name: "David Kim", phone: "+17135551240", source: "Zillow", status: "contacted", created: "2026-02-14", lastMessage: "Interested in 3BR in Heights" },
+  { id: "7", name: "David Kim", phone: "+17135551240", source: "HAR", status: "contacted", created: "2026-02-14", lastMessage: "Interested in 3BR in Heights" },
   { id: "8", name: "Sarah Nguyen", phone: "+17135551241", source: "Website", status: "appointment", created: "2026-02-15", lastMessage: "Saturday 10am?" },
-  { id: "9", name: "Michael Brown", phone: "+17135551242", source: "Zillow", status: "qualified", created: "2026-02-12", lastMessage: "What's the HOA situation?" },
+  { id: "9", name: "Michael Brown", phone: "+17135551242", source: "Referral", status: "qualified", created: "2026-02-12", lastMessage: "What's the HOA situation?" },
   { id: "10", name: "Emily Davis", phone: "+17135551243", source: "Realtor.com", status: "new", created: "2026-02-16", lastMessage: "First-time buyer here" },
   { id: "11", name: "Chris Taylor", phone: "+17135551244", source: "Facebook Leads", status: "contacted", created: "2026-02-15", lastMessage: "Saw your ad for Houston area" },
   { id: "12", name: "Pat Johnson", phone: "+17135551245", source: "Zillow", status: "lost", created: "2026-02-11", lastMessage: "Went with another agent" },
+  { id: "13", name: "Jessica Moore", phone: "+17135551246", source: "HAR", status: "new", created: "2026-02-17", lastMessage: "Saw listing on HAR, interested" },
+  { id: "14", name: "Daniel Wright", phone: "+17135551247", source: "Open house", status: "contacted", created: "2026-02-16", lastMessage: "Met at Saturday open house" },
 ];
 
 export const demoConversations: {
@@ -75,10 +77,29 @@ export const demoConversations: {
       { from: "agent", text: "I'll send 3 listings in that range in the Heights.", time: "45m ago" },
     ],
   },
+  {
+    id: "c6",
+    leadId: "7",
+    leadName: "David Kim",
+    messages: [
+      { from: "lead", text: "Interested in 3BR in Heights", time: "2h ago" },
+      { from: "agent", text: "Great! I have 2 new listings there. Want a tour this week?", time: "1h ago" },
+      { from: "lead", text: "Yes, Thursday afternoon?", time: "45m ago" },
+    ],
+  },
+  {
+    id: "c7",
+    leadId: "8",
+    leadName: "Sarah Nguyen",
+    messages: [
+      { from: "lead", text: "Saturday 10am?", time: "30m ago" },
+      { from: "agent", text: "Saturday 10am works. I'll confirm the address.", time: "15m ago" },
+    ],
+  },
 ];
 
 export const demoAnalytics = {
-  totalLeads: 28,
+  totalLeads: 14,
   avgResponseMin: 2.4,
   conversionRate: 38,
   responseRate: 95,
@@ -168,20 +189,35 @@ export function getDemoLeadsForConversations(): Lead[] {
 
 // ---- Dashboard / Analytics helpers ----
 export function getDemoDashboardStats(): DashboardStats {
+  const closed = demoLeads.filter((l) => l.status === "closed").length;
+  const lost = demoLeads.filter((l) => l.status === "lost").length;
+  const activeLeads = demoLeads.length - closed - lost;
+  const appointments = demoLeads.filter((l) => l.status === "appointment").length;
+  const qualifiedCount = demoLeads.filter(
+    (l) => l.status === "qualified" || l.status === "appointment" || l.status === "closed"
+  ).length;
+  const qualifiedRate = demoLeads.length > 0 ? Math.round((qualifiedCount / demoLeads.length) * 100) : 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const leadsToday = demoLeads.filter((l) => l.created === today).length || 6;
+
   return {
-    leadsToday: 5,
-    qualifiedRate: Math.round(demoAnalytics.conversionRate),
+    leadsToday,
+    qualifiedRate: qualifiedRate || Math.round(demoAnalytics.conversionRate),
     avgResponseTime: `${demoAnalytics.avgResponseMin} min`,
-    appointments: 4,
-    closedThisMonth: 3,
-    activeLeads: demoAnalytics.totalLeads - 3,
+    appointments,
+    closedThisMonth: closed || 3,
+    activeLeads,
   };
 }
 
 export function getDemoActivity(limit = 20): ActivityItem[] {
   const items: ActivityItem[] = [];
   const agents = getDemoAgentsAsAppType();
-  demoLeads.slice(0, 8).forEach((l, i) => {
+  const now = Date.now();
+  const hour = 60 * 60 * 1000;
+
+  demoLeads.slice(0, 10).forEach((l, i) => {
+    const t = new Date(now - (20 - i) * hour);
     items.push({
       id: `act-lead-${l.id}`,
       type: "lead_created",
@@ -190,9 +226,51 @@ export function getDemoActivity(limit = 20): ActivityItem[] {
       leadId: l.id,
       leadName: l.name,
       agentName: agents[i % agents.length]?.name,
-      createdAt: l.created + "T12:00:00.000Z",
+      createdAt: t.toISOString(),
     });
   });
+
+  items.push({
+    id: "act-status-1",
+    type: "status_changed",
+    title: "Status updated",
+    description: "contacted → qualified",
+    leadId: "2",
+    leadName: "Maria Santos",
+    agentName: agents[1]?.name,
+    createdAt: new Date(now - 8 * hour).toISOString(),
+  });
+  items.push({
+    id: "act-status-2",
+    type: "status_changed",
+    title: "Status updated",
+    description: "qualified → appointment",
+    leadId: "3",
+    leadName: "James Wilson",
+    agentName: agents[2]?.name,
+    createdAt: new Date(now - 6 * hour).toISOString(),
+  });
+  items.push({
+    id: "act-assign-1",
+    type: "lead_assigned",
+    title: "Lead assigned",
+    description: undefined,
+    leadId: "4",
+    leadName: "Lisa Chen",
+    agentName: agents[3]?.name,
+    createdAt: new Date(now - 2 * hour).toISOString(),
+  });
+  items.push({
+    id: "act-assign-2",
+    type: "lead_assigned",
+    title: "Lead assigned",
+    description: undefined,
+    leadId: "13",
+    leadName: "Jessica Moore",
+    agentName: agents[0]?.name,
+    createdAt: new Date(now - 1 * hour).toISOString(),
+  });
+
   demoConversations.forEach((c, i) => {
     const last = c.messages[c.messages.length - 1];
     if (last) {
@@ -203,10 +281,11 @@ export function getDemoActivity(limit = 20): ActivityItem[] {
         description: last.text.slice(0, 60),
         leadId: c.leadId,
         leadName: c.leadName,
-        createdAt: new Date(Date.now() - (i + 1) * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(now - (i + 3) * hour).toISOString(),
       });
     }
   });
+
   items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   return items.slice(0, limit);
 }

@@ -33,7 +33,8 @@ Copy `.env.example` to `.env.local` and fill in values as needed:
 | `TWILIO_FROM_NUMBER` | Twilio phone number | For SMS |
 | `MAKE_WEBHOOK_URL` | Make.com webhook URL | For automations |
 | `DEMO_MODE_DEFAULT` | Default demo mode (true/false) | No, defaults true |
-| `SESSION_SECRET` | Secret for signing session cookies (min 16 chars) | Yes |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key | For production (keyless in dev) |
+| `CLERK_SECRET_KEY` | Clerk secret key | For production (keyless in dev) |
 
 ## Demo mode
 
@@ -72,13 +73,9 @@ When demo mode is **on** (default), the app uses in-memory seed data. No API key
 3. The `/api/make/trigger` route forwards payloads to that URL.
 4. Configure the scenario to write Lead **Source** and **Status** (and optionally closure/appointment) to Airtable so the dashboard and leads list stay accurate.
 
-## Replacing mock auth
+## Auth (Clerk)
 
-The app uses cookie-based session auth (JWT signed with `SESSION_SECRET`). To switch to a provider:
-
-1. **Clerk**: Install `@clerk/nextjs`, add `ClerkProvider`, and replace `middleware.ts` with Clerk's auth middleware. Remove `/api/auth/session` and use Clerk's session helpers.
-2. **Auth.js**: Install `next-auth`, configure providers, and replace the session cookie logic in `middleware.ts` and `src/lib/auth.ts`.
-3. **Supabase**: Install `@supabase/ssr`, use Supabase auth in middleware and replace `getSession()` in layouts.
+The app uses [Clerk](https://clerk.com) for sign-in and sign-up. Roles (Broker-Owner, Agent) are stored in Clerk user `publicMetadata` and synced from the optional Airtable Users table. For local development you can use Clerk keyless mode (`next dev` without keys). For `next build` and production, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in `.env.local`.
 
 ## Build and deploy
 

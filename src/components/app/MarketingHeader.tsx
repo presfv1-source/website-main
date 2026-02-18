@@ -9,10 +9,10 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/security", label: "Security" },
-  { href: "/contact", label: "Contact" },
+  { href: "/#features", label: "Features" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/login", label: "Demo" },
+  { href: "/login", label: "Login" },
 ] as const;
 
 export function MarketingHeader({ className }: { className?: string }) {
@@ -36,19 +36,13 @@ export function MarketingHeader({ className }: { className?: string }) {
         <nav className="hidden md:flex flex-wrap items-center justify-end gap-6" aria-label="Main">
           {navLinks.map(({ href, label }) => (
             <Link
-              key={href}
+              key={`${href}-${label}`}
               href={href}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
             >
               {label}
             </Link>
           ))}
-          <Link
-            href="/login"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
-          >
-            Log in
-          </Link>
           <Button asChild size="sm" className="shrink-0">
             <Link href="/signup">Start free trial</Link>
           </Button>
@@ -66,22 +60,16 @@ export function MarketingHeader({ className }: { className?: string }) {
               <nav className="flex flex-col gap-1" aria-label="Main">
                 {navLinks.map(({ href, label }) => (
                   <Link
-                    key={href}
+                    key={`${href}-${label}`}
                     href={href}
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {label}
                   </Link>
                 ))}
                 <Link
-                  href="/login"
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  Log in
-                </Link>
-                <Link
                   href="/signup"
-                  className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  className="mt-4 inline-flex items-center justify-center min-h-[44px] rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Start free trial
                 </Link>

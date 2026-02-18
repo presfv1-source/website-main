@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { Search, LogOut, User, Building2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -43,11 +44,11 @@ export function Topbar({
   className,
 }: TopbarProps) {
   const router = useRouter();
+  const { signOut } = useClerk();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    window.location.href = "/login";
+    await signOut({ redirectUrl: "/login" });
   }
 
   function handleViewAs(role: Role) {

@@ -8,6 +8,8 @@ const serverSchema = z.object({
   AIRTABLE_TABLE_MESSAGES: z.string().default("Messages"),
   /** Optional: Users table with Email, Role (broker/agent), Agent (link to Agents) */
   AIRTABLE_TABLE_USERS: z.string().default(""),
+  /** Waitlist table for beta signups (Email, Name, Source) */
+  AIRTABLE_TABLE_WAITLIST: z.string().default("Waitlist"),
   STRIPE_SECRET_KEY: z.string().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().default(""),
   TWILIO_ACCOUNT_SID: z.string().default(""),
@@ -65,6 +67,7 @@ function parseEnv() {
     AIRTABLE_TABLE_AGENTS: process.env.AIRTABLE_TABLE_AGENTS,
     AIRTABLE_TABLE_MESSAGES: process.env.AIRTABLE_TABLE_MESSAGES,
     AIRTABLE_TABLE_USERS: process.env.AIRTABLE_TABLE_USERS ?? "",
+    AIRTABLE_TABLE_WAITLIST: process.env.AIRTABLE_TABLE_WAITLIST ?? "Waitlist",
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,

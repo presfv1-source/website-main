@@ -1,21 +1,10 @@
-import { Suspense } from "react";
-import { LoginForm } from "@/components/app/LoginForm";
+import { SignIn } from "@clerk/nextjs";
+import Link from "next/link";
+import { Building2 } from "lucide-react";
 import { CONTAINER_NARROW } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
-function LoginFormFallback() {
-  return (
-    <div className="w-full max-w-md mx-auto animate-pulse">
-      <div className="h-8 w-48 mx-auto mb-8 bg-muted rounded" />
-      <div className="rounded-xl border bg-card p-6 shadow-lg space-y-4">
-        <div className="h-6 w-32 bg-muted rounded" />
-        <div className="h-10 w-full bg-muted rounded" />
-        <div className="h-10 w-full bg-muted rounded" />
-        <div className="h-11 w-full bg-muted rounded" />
-      </div>
-    </div>
-  );
-}
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   return (
@@ -25,9 +14,36 @@ export default function LoginPage() {
         CONTAINER_NARROW
       )}
     >
-      <Suspense fallback={<LoginFormFallback />}>
-        <LoginForm />
-      </Suspense>
+      <div className="text-center mb-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-xl font-bold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+        >
+          <Building2 className="size-6" aria-hidden />
+          LeadHandler.ai
+        </Link>
+        <p className="text-sm text-muted-foreground mt-1">
+          SMS Lead Response &amp; Routing
+        </p>
+      </div>
+      <SignIn
+        redirectUrl="/app/dashboard"
+        signUpUrl="/signup"
+        appearance={{
+          elements: {
+            rootBox: "mx-auto",
+            card: "shadow-lg rounded-xl",
+          },
+        }}
+      />
+      <p className="text-center mt-6 text-sm text-muted-foreground">
+        <Link
+          href="/"
+          className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+        >
+          Back to home
+        </Link>
+      </p>
     </div>
   );
 }

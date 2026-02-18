@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env.mjs";
-import { getSessionToken } from "@/app/api/auth/session/route";
+import { getSessionToken } from "@/lib/auth";
 
 const DEMO_COOKIE = "lh_demo";
 

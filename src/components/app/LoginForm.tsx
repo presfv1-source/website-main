@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signInWithPopup, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
@@ -24,6 +24,17 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl")?.trim() || DEFAULT_CALLBACK;
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/firebase/session", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && data?.data) {
+          router.replace(callbackUrl || "/app/dashboard");
+        }
+      })
+      .catch(() => {});
+  }, [callbackUrl, router]);
 
   async function createSession(idToken: string): Promise<boolean> {
     const res = await fetch("/api/auth/firebase/session", {

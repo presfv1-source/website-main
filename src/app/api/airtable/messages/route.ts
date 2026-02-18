@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hasAirtable } from "@/lib/config";
 import { getDemoMessagesAsAppType } from "@/lib/demoData";
-import { getDemoEnabled } from "@/app/api/auth/session/route";
+import { getDemoEnabled, getSessionToken } from "@/lib/auth";
 import { AirtableAuthError } from "@/lib/airtable";
 
 export async function GET(request: NextRequest) {
   try {
-    const demo = await getDemoEnabled(request);
+    const session = await getSessionToken(request);
+    const demo = await getDemoEnabled(session);
     if (demo) {
       const { searchParams } = new URL(request.url);
       const leadId = searchParams.get("leadId") ?? undefined;

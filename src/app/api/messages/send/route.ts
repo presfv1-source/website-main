@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getDemoEnabled } from "@/app/api/auth/session/route";
+import { getDemoEnabled, getSessionToken } from "@/lib/auth";
 import { appendMessage } from "@/lib/demo/data";
 import { sendMessage } from "@/lib/twilio";
 
@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
     );
   }
   try {
-    const demo = await getDemoEnabled(request);
+    const session = await getSessionToken(request);
+    const demo = await getDemoEnabled(session);
     const { to, body, leadId } = parsed.data;
     if (demo && leadId) {
       appendMessage(leadId, body, "out");

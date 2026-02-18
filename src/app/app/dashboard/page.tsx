@@ -17,6 +17,7 @@ import { StatCard } from "@/components/app/StatCard";
 import { SectionCard } from "@/components/app/SectionCard";
 import { LeadStatusPill } from "@/components/app/LeadStatusPill";
 import { DashboardAgentLeaderboard } from "@/components/app/DashboardAgentLeaderboard";
+import { DashboardTestimonials } from "@/components/app/DashboardTestimonials";
 import { EmptyState } from "@/components/app/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecentActivity } from "@/components/app/RecentActivity";
@@ -273,6 +274,10 @@ async function DashboardContent() {
           />
         </SectionCard>
       )}
+
+      <SectionCard title="Trusted by Texas Broker-Owners">
+        <DashboardTestimonials />
+      </SectionCard>
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-2">
         <SectionCard title="Recent messages">

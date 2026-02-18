@@ -1,3 +1,4 @@
+import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { env } from "./env.mjs";
@@ -86,4 +87,9 @@ export async function getDemoEnabled(session?: Session | null): Promise<boolean>
   if (cookie === "true") return true;
   if (cookie === "false") return false;
   return env.server.DEMO_MODE_DEFAULT;
+}
+
+/** For API routes: same as getSession(). */
+export async function getSessionToken(_request?: NextRequest): Promise<Session | null> {
+  return getSession();
 }

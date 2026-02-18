@@ -70,8 +70,8 @@ export default function AccountPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/auth/session").then((r) => r.json()),
-      fetch("/api/demo/state").then((r) => r.json()),
+      fetch("/api/auth/firebase/session", { credentials: "include" }).then((r) => r.json()),
+      fetch("/api/demo/state", { credentials: "include" }).then((r) => r.json()),
     ]).then(([sessionRes, demoRes]) => {
       if (sessionRes.success && sessionRes.data) {
         const data = sessionRes.data as { role?: string; effectiveRole?: string; name?: string; demoEnabled?: boolean; userId?: string };
@@ -145,9 +145,10 @@ export default function AccountPage() {
 
   function handleNameSave() {
     if (editName.trim() === (session?.name ?? "").trim()) return;
-    fetch("/api/auth/session", {
+    fetch("/api/auth/firebase/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ name: editName.trim() }),
     })
       .then((r) => r.json())

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { Check, ArrowRight, X } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,8 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-
-const BETA_BANNER_STORAGE = "leadhandler-pricing-beta-banner-dismissed";
 
 const BETA_PLANS = [
   {
@@ -90,48 +88,10 @@ const COMPARISON_ROWS = [
 ];
 
 export function PricingSection() {
-  const [betaBannerDismissed, setBetaBannerDismissed] = useState(false);
   const [annual, setAnnual] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(BETA_BANNER_STORAGE) === "1") setBetaBannerDismissed(true);
-    } catch {
-      // keep default
-    }
-  }, []);
-
-  function dismissBetaBanner() {
-    try {
-      localStorage.setItem(BETA_BANNER_STORAGE, "1");
-      setBetaBannerDismissed(true);
-    } catch {
-      setBetaBannerDismissed(true);
-    }
-  }
 
   return (
     <Tabs defaultValue="beta" className="w-full">
-      {/* Dismissible beta banner */}
-      {!betaBannerDismissed && (
-        <div
-          role="banner"
-          className="relative flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 pr-12 mb-8"
-        >
-          <p className="text-sm text-foreground">
-            <strong>Limited Beta Launch:</strong> Lock in $99/mo Essentials or $249/mo Pro—spots limited before $349/$749. 14-day trial, no card required.
-          </p>
-          <button
-            type="button"
-            onClick={dismissBetaBanner}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-muted text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Dismiss banner"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-
       <TabsList className="mb-8 grid w-full max-w-md mx-auto grid-cols-2">
         <TabsTrigger value="beta">Beta Pricing</TabsTrigger>
         <TabsTrigger value="standard">Standard</TabsTrigger>

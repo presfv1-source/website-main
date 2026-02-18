@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { hasAirtable } from "@/lib/config";
 import { getDemoLeadsAsAppType } from "@/lib/demoData";
-import { getDemoEnabled, getSessionToken } from "@/app/api/auth/session/route";
+import { getDemoEnabled, getSessionToken } from "@/lib/auth";
 import { AirtableAuthError } from "@/lib/airtable";
 
 const postSchema = z.object({
@@ -16,7 +16,8 @@ const postSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const demo = await getDemoEnabled(request);
+    const session = await getSessionToken(request);
+    const demo = await getDemoEnabled(session);
     if (demo) {
       const leads = getDemoLeadsAsAppType();
       return NextResponse.json({ success: true, data: leads });
@@ -24,7 +25,6 @@ export async function GET(request: NextRequest) {
     if (!hasAirtable) {
       return NextResponse.json({ success: true, data: [] });
     }
-    const session = await getSessionToken(request);
     const agentId = session?.role === "agent" ? session?.agentId : undefined;
     const leads = await import("@/lib/airtable").then((m) => m.getLeads(agentId));
     return NextResponse.json({ success: true, data: leads });
@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
     );
   }
   try {
-    const demo = await getDemoEnabled(request);
+    const session = await getSessionToken(request);
+    const demo = await getDemoEnabled(session);
     const body = parsed.data;
     const leadData = {
       name: body.name,

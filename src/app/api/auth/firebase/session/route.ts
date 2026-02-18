@@ -2,18 +2,76 @@ import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { getAdminAuth } from "@/lib/firebase-admin";
 import { getAirtableUserByEmail, createAirtableUser, getAgentIdByEmail } from "@/lib/airtable";
+import { getSession, getDemoEnabled } from "@/lib/auth";
 import { env } from "@/lib/env.mjs";
 
 const DEV_ADMIN_EMAIL = "presfv1@gmail.com";
 const SESSION_COOKIE_NAME = "lh_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const OVERRIDE_COOKIE = "lh_session_override";
+const VIEW_AS_COOKIE = "lh_view_as";
+const DEMO_COOKIE = "lh_demo";
 
 type ValidRole = "owner" | "broker" | "agent";
 
+export async function GET() {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: { code: "UNAUTHORIZED", message: "No session" } },
+      { status: 401 }
+    );
+  }
+  const demoEnabled = await getDemoEnabled(session);
+  return NextResponse.json({
+    success: true,
+    data: {
+      name: session.name,
+      role: session.role,
+      effectiveRole: session.effectiveRole,
+      userId: session.userId,
+      demoEnabled,
+      ...(session.agentId != null && { agentId: session.agentId }),
+      ...(session.email != null && { email: session.email }),
+    },
+  });
+}
+
+export async function DELETE() {
+  const res = NextResponse.json({ success: true });
+  const opts = { path: "/" as const, maxAge: 0 };
+  res.cookies.set(SESSION_COOKIE_NAME, "", opts);
+  res.cookies.set(OVERRIDE_COOKIE, "", opts);
+  res.cookies.set(VIEW_AS_COOKIE, "", opts);
+  res.cookies.set(DEMO_COOKIE, "", opts);
+  return res;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json().catch(() => ({}))) as { idToken?: string; name?: string };
     const idToken = typeof body?.idToken === "string" ? body.idToken.trim() : null;
+    const name = typeof body?.name === "string" ? body.name.trim() : undefined;
+
+    if (name != null && !idToken) {
+      const session = await getSession();
+      if (!session) {
+        return NextResponse.json(
+          { success: false, error: { code: "UNAUTHORIZED", message: "Not logged in" } },
+          { status: 401 }
+        );
+      }
+      const res = NextResponse.json({ success: true });
+      res.cookies.set(OVERRIDE_COOKIE, JSON.stringify({ name }), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: SESSION_MAX_AGE,
+      });
+      return res;
+    }
+
     if (!idToken) {
       return NextResponse.json({ ok: false, error: "Missing idToken" }, { status: 400 });
     }

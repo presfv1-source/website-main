@@ -27,6 +27,9 @@ type ValidRole = "owner" | "broker" | "agent";
 
 function toRole(raw: unknown): Role {
   if (raw === "owner" || raw === "broker" || raw === "agent") return raw;
+  // Map marketing label "broker-owner" to app role "owner"
+  if (raw === "broker-owner") return "owner";
+  // Global fallback: undefined or invalid → broker
   return "broker";
 }
 
@@ -74,7 +77,12 @@ export async function getSession(): Promise<Session | null> {
   let agentId: string | undefined =
     typeof meta?.agentId === "string" ? meta.agentId : undefined;
 
-  if (meta?.role !== "owner" && meta?.role !== "broker" && meta?.role !== "agent" && email) {
+  const hasValidRole =
+    meta?.role === "owner" ||
+    meta?.role === "broker" ||
+    meta?.role === "agent" ||
+    meta?.role === "broker-owner";
+  if (!hasValidRole && email) {
     const synced = await syncRoleToClerk(userId, email);
     role = synced.role;
     agentId = synced.agentId;

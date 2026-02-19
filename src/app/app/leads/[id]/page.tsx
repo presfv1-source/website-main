@@ -5,7 +5,6 @@ import {
   getDemoLeads,
   getDemoMessages,
   getDemoInsights,
-  appendMessage,
 } from "@/lib/demo/data";
 import { Breadcrumbs } from "@/components/app/Breadcrumbs";
 import { LeadStatusPill } from "@/components/app/LeadStatusPill";
@@ -13,18 +12,36 @@ import { Timeline } from "@/components/app/Timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageComposer } from "./MessageComposer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Mail, Phone, MapPin, User } from "lucide-react";
+import { Mail, Phone, User } from "lucide-react";
 
 async function LeadDetailContent({ id }: { id: string }) {
   const session = await getSession();
   const demoEnabled = await getDemoEnabled(session);
-  const leads = demoEnabled ? getDemoLeads() : await import("@/lib/airtable").then((m) => m.getLeads());
+  let leads: Awaited<ReturnType<typeof getDemoLeads>> = [];
+  if (demoEnabled) {
+    leads = getDemoLeads();
+  } else {
+    try {
+      const airtable = await import("@/lib/airtable");
+      leads = await airtable.getLeads();
+    } catch {
+      leads = [];
+    }
+  }
   const lead = leads.find((l) => l.id === id);
   if (!lead) notFound();
 
-  const messages = demoEnabled
-    ? getDemoMessages(id)
-    : await import("@/lib/airtable").then((m) => m.getMessages(id));
+  let messages: Awaited<ReturnType<typeof getDemoMessages>> = [];
+  if (demoEnabled) {
+    messages = getDemoMessages(id);
+  } else {
+    try {
+      const airtable = await import("@/lib/airtable");
+      messages = await airtable.getMessages(id);
+    } catch {
+      messages = [];
+    }
+  }
   const insights = demoEnabled ? getDemoInsights(id) : [];
 
   const timelineItems = [

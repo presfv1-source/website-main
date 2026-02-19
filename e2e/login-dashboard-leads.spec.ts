@@ -3,6 +3,22 @@ import { test, expect } from "@playwright/test";
 const TEST_EMAIL = process.env.TEST_USER_EMAIL;
 const TEST_PASSWORD = process.env.TEST_USER_PASSWORD;
 
+test.describe("Smoke (public)", () => {
+  test("homepage loads", async ({ page }) => {
+    await page.goto("/");
+    await expect(
+      page.getByRole("link", { name: /LeadHandler\.ai/i }).or(page.getByRole("heading", { name: /LeadHandler|SMS lead/i }))
+    ).toBeVisible();
+  });
+
+  test("waitlist modal opens from Claim Beta Spot", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /Claim Beta Spot/i }).first().click();
+    await expect(page.getByRole("dialog").getByText(/Join the beta waitlist/i)).toBeVisible();
+    await expect(page.getByLabel(/email/i).or(page.getByPlaceholder(/you@brokerage/i))).toBeVisible();
+  });
+});
+
 test.describe("Login → Dashboard → Leads → One lead → Back", () => {
   test.skip(
     !TEST_EMAIL || !TEST_PASSWORD,
@@ -36,5 +52,28 @@ test.describe("Login → Dashboard → Leads → One lead → Back", () => {
     await expect(page).toHaveURL(/\/app\/leads/);
 
     expect(consoleErrors.filter((e) => !e.includes("favicon"))).toEqual([]);
+  });
+
+  test("dashboard shows after login with at least one section", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel(/email/i).fill(TEST_EMAIL!);
+    await page.getByLabel(/password/i).fill(TEST_PASSWORD!);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await expect(page).toHaveURL(/\/app\/dashboard/);
+    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /recent activity|recent messages|trusted by|my recent leads/i })
+    ).toBeVisible();
+  });
+
+  test("dashboard shows role in UI after login", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel(/email/i).fill(TEST_EMAIL!);
+    await page.getByLabel(/password/i).fill(TEST_PASSWORD!);
+    await page.getByRole("button", { name: /sign in/i }).click();
+    await expect(page).toHaveURL(/\/app\/dashboard/);
+    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    // Topbar shows "Viewing as {role}" for role-based UI
+    await expect(page.getByText(/Viewing as/i)).toBeVisible();
   });
 });

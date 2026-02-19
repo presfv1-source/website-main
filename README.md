@@ -77,6 +77,10 @@ When demo mode is **on** (default), the app uses in-memory seed data. No API key
 
 The app uses [Clerk](https://clerk.com) for sign-in and sign-up. Roles (Broker-Owner, Agent) are stored in Clerk user `publicMetadata` and synced from the optional Airtable Users table. For local development you can use Clerk keyless mode (`next dev` without keys). For `next build` and production, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in `.env.local`.
 
+### Testing roles
+
+To test different roles: open [Clerk Dashboard](https://dashboard.clerk.com) → Users → select a user → **Public metadata** → set `role` to `owner`, `broker`, or `agent`. For `agent`, also set `agentId` to an Airtable Agents record ID so "My recent leads" shows assigned leads. Owners can use **View as** on the Account page (`/app/account`) to preview broker/agent views.
+
 ## Build and deploy
 
 ```bash

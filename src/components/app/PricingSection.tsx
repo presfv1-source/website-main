@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -123,17 +123,29 @@ export function PricingSection() {
 
   async function handleWaitlistSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!waitlistName.trim() || !waitlistEmail.trim() || !waitlistBrokerage.trim() || !waitlistAgents) return;
+    if (!waitlistName.trim() || !waitlistEmail.trim() || !waitlistBrokerage.trim() || !waitlistAgents) {
+      toast.error("Name and email are required. Please fill in all fields.");
+      return;
+    }
     setWaitlistLoading(true);
     try {
-      const message = `Beta waitlist\nBrokerage: ${waitlistBrokerage.trim()}\nNumber of agents: ${waitlistAgents}`;
-      const res = await fetch("/api/contact", {
+      const source = `Brokerage: ${waitlistBrokerage.trim()}; Agents: ${waitlistAgents}`;
+      const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: waitlistName.trim(), email: waitlistEmail.trim(), message }),
+        body: JSON.stringify({
+          name: waitlistName.trim(),
+          email: waitlistEmail.trim(),
+          source,
+        }),
       });
-      if (!res.ok) throw new Error("Failed to submit");
-      toast.success("Thanks! We'll be in touch soon.");
+      const data = res.ok ? null : (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+      if (!res.ok) {
+        const msg = data?.error?.message ?? "Failed to submit";
+        toast.error(msg);
+        return;
+      }
+      toast.success("You're on the list! Check email for next steps.");
       setWaitlistOpen(false);
       setWaitlistName("");
       setWaitlistEmail("");
@@ -209,7 +221,14 @@ export function PricingSection() {
               </Select>
             </div>
             <Button type="submit" disabled={waitlistLoading} className="min-h-[44px]">
-              {waitlistLoading ? "Submitting…" : "Submit"}
+              {waitlistLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+                  Submitting…
+                </>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </form>
         </DialogContent>

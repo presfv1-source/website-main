@@ -16,6 +16,9 @@ export const metadata: Metadata = {
 };
 
 const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+if (!clerkPublishableKey && process.env.NODE_ENV === "production") {
+  throw new Error("Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY – required in production.");
+}
 
 export default function RootLayout({
   children,

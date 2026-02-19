@@ -21,6 +21,8 @@ import { DashboardTestimonials } from "@/components/app/DashboardTestimonials";
 import { EmptyState } from "@/components/app/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecentActivity } from "@/components/app/RecentActivity";
+import { DevRoleSwitcher } from "@/components/app/DevRoleSwitcher";
+import { DashboardTestSmsCard } from "@/components/app/DashboardTestSmsCard";
 
 const LeadActivityChart = dynamic(
   () => import("@/components/app/LeadActivityChart").then((m) => m.LeadActivityChart),
@@ -43,8 +45,9 @@ const DEFAULT_STATS: DashboardStats = {
 async function DashboardContent() {
   const session = await getSession();
   const demoEnabled = await getDemoEnabled(session);
-  const role = session?.role ?? "agent";
+  const role = session?.role ?? "broker";
   const agentId = role === "agent" ? session?.agentId : undefined;
+  const twilioNumber = process.env.TWILIO_PHONE_NUMBER || process.env.TWILIO_FROM_NUMBER || "+1-XXX-XXX-XXXX";
 
   let stats: DashboardStats = DEFAULT_STATS;
   let leads: Lead[] = [];
@@ -162,7 +165,7 @@ async function DashboardContent() {
     leads: Number(d?.leads) || 0,
   }));
 
-  const agentFilterId = demoEnabled ? "agent-1" : session?.userId;
+  const agentFilterId = demoEnabled ? "agent-1" : (role === "agent" ? session?.agentId : undefined);
   const myLeads = agentFilterId ? leads.filter((l) => l.assignedTo === agentFilterId) : [];
 
   if (!demoEnabled && leads.length === 0 && !airtableError) {
@@ -186,8 +189,8 @@ async function DashboardContent() {
     );
   }
 
-  const isOwner = session?.role === "owner";
   const isEffectiveOwner = session?.effectiveRole === "owner";
+  const roleLabel = (session?.role ?? "broker").toUpperCase();
 
   return (
     <div className="min-w-0 space-y-6 sm:space-y-8">
@@ -199,7 +202,12 @@ async function DashboardContent() {
           { label: "Dashboard" },
         ]}
       />
+      <p className="text-xs text-muted-foreground" data-testid="dashboard-role-label">
+        Viewing as: {roleLabel}
+      </p>
       {isEffectiveOwner && airtableError && <AirtableErrorFallback className="mb-4" />}
+
+      {process.env.NODE_ENV === "development" && <DevRoleSwitcher />}
 
       {demoEnabled && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -213,6 +221,8 @@ async function DashboardContent() {
           </div>
         </div>
       )}
+
+      <DashboardTestSmsCard phoneNumber={twilioNumber} />
 
       <div className="flex flex-wrap items-center gap-4">
         <Button asChild variant="outline" size="sm" className="min-h-[44px]">
@@ -269,7 +279,9 @@ async function DashboardContent() {
             emptyMessage={
               !demoEnabled && leads.length === 0
                 ? "Connect your lead sources in Settings to see activity."
-                : "No recent activity—add a lead!"
+                : demoEnabled
+                  ? "No activity yet – text the test number to start!"
+                  : "No recent activity—add a lead!"
             }
           />
         </SectionCard>

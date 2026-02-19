@@ -20,10 +20,9 @@ async function AgentsContent() {
     } catch (err) {
       if (err instanceof AirtableAuthError) {
         airtableError = true;
-        agents = [];
-      } else {
-        throw err;
       }
+      // was: else { throw err; } — fallback to empty so UI shows empty state instead of throwing
+      agents = [];
     }
   }
 

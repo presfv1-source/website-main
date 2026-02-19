@@ -100,7 +100,8 @@ export const demoConversations: {
 
 export const demoAnalytics = {
   totalLeads: 14,
-  avgResponseMin: 2.4,
+  /* was 2.4; beta stub: 3 min for consistency with hero preview */
+  avgResponseMin: 3,
   conversionRate: 38,
   responseRate: 95,
 };

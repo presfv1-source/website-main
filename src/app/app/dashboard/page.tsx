@@ -287,7 +287,8 @@ async function DashboardContent() {
         </SectionCard>
       )}
 
-      <SectionCard title="Trusted by Texas Broker-Owners">
+      {/* was: title="Trusted by Texas Broker-Owners" */}
+      <SectionCard title="Trusted by Broker-Owners">
         <DashboardTestimonials />
       </SectionCard>
 

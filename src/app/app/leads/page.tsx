@@ -26,10 +26,9 @@ async function LeadsContent() {
     } catch (err) {
       if (err instanceof AirtableAuthError) {
         airtableError = true;
-        leads = [];
-      } else {
-        throw err;
       }
+      // was: else { throw err; } — fallback to empty so UI shows empty state instead of throwing
+      leads = [];
     }
   }
 

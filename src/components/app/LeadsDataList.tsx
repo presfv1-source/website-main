@@ -33,14 +33,14 @@ import type { Lead } from "@/lib/types";
 
 const PAGE_SIZE = 10;
 
-const SOURCE_OPTIONS = ["All", "Zillow", "Realtor.com", "Website", "Other"] as const;
+const SOURCE_OPTIONS = ["All", "Zillow", "Realtor.com", "Website", "HAR", "Facebook Leads", "Referral", "Open house", "Other"] as const;
 type SourceFilterValue = (typeof SOURCE_OPTIONS)[number];
 
 function normalizeSource(s: string | undefined): string {
   return (s ?? "").trim().toLowerCase();
 }
 
-const KNOWN_SOURCES = ["zillow", "realtor.com", "website", "facebook leads"];
+const KNOWN_SOURCES = ["zillow", "realtor.com", "website", "facebook leads", "har", "referral", "open house"];
 
 /** Treat empty or unknown source as "Other" for filtering. */
 function sourceMatchesFilter(leadSource: string | undefined, filter: SourceFilterValue): boolean {
@@ -167,7 +167,7 @@ export function LeadsDataList({ leads }: LeadsDataListProps) {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder="Search by name, email, or phone..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-9 h-9"
@@ -175,10 +175,10 @@ export function LeadsDataList({ leads }: LeadsDataListProps) {
         </div>
       </div>
 
-      {/* Desktop: table with overflow */}
+      {/* Desktop: table with horizontal scroll on small viewports */}
       <div
         className={cn(
-          "hidden rounded-lg border overflow-hidden",
+          "hidden rounded-lg border overflow-hidden min-w-0",
           `${RESPONSIVE_LIST_BREAKPOINT}:block overflow-x-auto`
         )}
       >

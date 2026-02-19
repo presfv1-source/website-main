@@ -60,7 +60,8 @@ export function MarketingFooter({ className }: { className?: string }) {
           </div>
         </div>
         <p className={cn(TYPO.mutedSmall, "text-muted-foreground text-center sm:text-left border-t border-border pt-6")}>
-          © 2026 LeadHandler.ai · Houston, TX
+          {/* was: Houston, TX */}
+          © 2026 LeadHandler.ai · United States
         </p>
       </div>
     </footer>

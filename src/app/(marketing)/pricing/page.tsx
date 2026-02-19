@@ -19,7 +19,8 @@ export default function PricingPage() {
             Choose the plan that fits your brokerage.
           </p>
           <p className={cn(TYPO.muted, "mt-1 text-sm")}>
-            SMS-first lead response for Texas real estate teams.
+            {/* was: Texas real estate teams */}
+            SMS-first lead response for real estate teams.
           </p>
         </div>
 
@@ -30,7 +31,8 @@ export default function PricingPage() {
         </div>
 
         <section className="mt-12 md:mt-16 rounded-xl border bg-muted/30 p-6 md:p-8 text-center max-w-2xl mx-auto">
-          <h2 className={cn(TYPO.h2, "text-xl")}>For Houston brokers</h2>
+          {/* was: For Houston brokers */}
+          <h2 className={cn(TYPO.h2, "text-xl")}>For brokers</h2>
           <p className={cn(TYPO.muted, "mt-2 text-sm")}>
             Speed-to-lead wins listings. Get instant SMS response, AI qualification, and fair routing—so every lead gets a fast reply and the right agent. Try the demo with no setup.
           </p>

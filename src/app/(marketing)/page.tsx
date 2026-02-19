@@ -64,7 +64,8 @@ export default function MarketingHomePage() {
           className={cn(CONTAINER, PAGE_PADDING, "py-16 max-w-5xl mx-auto")}
         >
           <h2 className="text-2xl font-bold text-center mb-8">
-            Trusted by Texas broker-owners
+            {/* was: Trusted by Texas broker-owners */}
+            Trusted by Broker-Owners
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t) => (

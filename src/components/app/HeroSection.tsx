@@ -9,15 +9,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { UserPlus, Clock, User } from "lucide-react";
+import { UserPlus, Clock, User, Calendar, CheckCircle } from "lucide-react";
 
 /** Optional: add public/dashboard-screenshot.png and set USE_DASHBOARD_IMAGE = true for real screenshot */
 const USE_DASHBOARD_IMAGE = false;
 const DASHBOARD_IMAGE_PATH = "/dashboard-screenshot.png";
 
+/** Dashboard preview metrics (demo-aligned: appointments 2, closed 1, avg 3 min) */
 const FAKE_STATS = [
   { label: "New leads", value: "12", tooltip: "Leads in the last 7 days" },
   { label: "Avg response", value: "3 min", tooltip: "First-reply time across team" },
+  { label: "Appointments", value: "2", tooltip: "Scheduled this period (demo)" },
+  { label: "Closed (month)", value: "1", tooltip: "Closed this month (demo)" },
 ];
 
 const FAKE_INBOX = [
@@ -50,7 +53,8 @@ export function HeroSection() {
             Respond first. <span className="underline decoration-burnt-orange/60 decoration-2 underline-offset-4">Close more.</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-10">
-            Speed-to-lead wins listings. Texas broker-owners use LeadHandler to reply in minutes, qualify with AI, and route every lead to the right agent—from one inbox.
+            {/* was: Texas broker-owners */}
+            Speed-to-lead wins listings. Broker-owners use LeadHandler to reply in minutes, qualify with AI, and route every lead to the right agent—from one inbox.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-base min-h-[44px] hover:ring-2 hover:ring-burnt-orange/40 hover:ring-offset-2">
@@ -80,16 +84,20 @@ export function HeroSection() {
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">
                   Dashboard preview
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
                   {FAKE_STATS.map((s) => (
                     <Tooltip key={s.label}>
                       <TooltipTrigger asChild>
                         <div className="rounded-lg border bg-card px-4 py-3 shadow-sm flex items-center gap-3 cursor-default">
-                          <div className="h-9 w-9 rounded-md bg-primary/10 flex items-center justify-center">
+                          <div className="h-9 w-9 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
                             {s.label === "New leads" ? (
                               <UserPlus className="h-4 w-4 text-primary" />
-                            ) : (
+                            ) : s.label === "Avg response" ? (
                               <Clock className="h-4 w-4 text-primary" />
+                            ) : s.label === "Appointments" ? (
+                              <Calendar className="h-4 w-4 text-primary" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-primary" />
                             )}
                           </div>
                           <div>
@@ -127,24 +135,25 @@ export function HeroSection() {
                   </div>
                   <div>
                     <p className="text-xs font-medium text-muted-foreground mb-2">Recent activity</p>
-                    <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-                      <div className="relative pl-5 pr-3 py-2 space-y-0">
-                        <div className="absolute left-2 top-0 bottom-0 w-px bg-border" aria-hidden />
-                        {FAKE_TIMELINE.map((e, i) => (
-                          <Tooltip key={i}>
+                    {/* was: vertical timeline; now card grid to avoid squished layout */}
+                    <div className="flex flex-col md:grid md:grid-cols-2 gap-4 min-w-0">
+                      {FAKE_TIMELINE.length === 0 ? (
+                        <p className="text-sm text-muted-foreground py-4 rounded-lg bg-card border border-border px-4">
+                          No demo activity – sign up to see real ones!
+                        </p>
+                      ) : (
+                        FAKE_TIMELINE.map((e, i) => (
+                          <Tooltip key={`timeline-${i}`}>
                             <TooltipTrigger asChild>
-                              <div className="relative flex gap-2 py-2.5 first:pt-2 last:pb-2">
-                                <span className="absolute left-0 w-2 h-2 rounded-full bg-primary -translate-x-[calc(0.5rem-2px)] top-5" aria-hidden />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm">{e.text}</p>
-                                  <p className="text-xs text-muted-foreground">{e.time}</p>
-                                </div>
+                              <div className="p-4 rounded-lg bg-card shadow-sm border border-border flex flex-col gap-1 min-w-0">
+                                <p className="text-sm break-words">{e.text}</p>
+                                <p className="text-xs text-muted-foreground whitespace-nowrap">{e.time}</p>
                               </div>
                             </TooltipTrigger>
                             <TooltipContent>Activity in your brokerage</TooltipContent>
                           </Tooltip>
-                        ))}
-                      </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>

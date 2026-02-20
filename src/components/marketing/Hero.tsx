@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { CONTAINER_WIDE, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 import { DashboardMockup } from "./DashboardMockup";
@@ -8,34 +7,37 @@ import { Button } from "./Button";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex flex-col justify-center py-16 md:py-24 overflow-hidden">
-      <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,#EFF6FF_0%,#FFFFFF_70%)]"
-        aria-hidden
-      />
+    <section className="relative min-h-[90vh] flex flex-col justify-center py-16 md:py-24 overflow-hidden bg-gray-950">
       <div className="relative w-full">
         <div className={cn(CONTAINER_WIDE, PAGE_PADDING)}>
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight mb-6 leading-[1.1] text-[clamp(1.75rem,6vw,5.5rem)]">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white leading-[1.05]">
               Every text lead answered in seconds — routed to the right agent.
             </h1>
-            <p className="text-base sm:text-lg md:text-xl font-sans text-gray-500 leading-relaxed mb-10 max-w-2xl">
+            <p className="text-lg md:text-xl text-slate-400 max-w-2xl mt-4 leading-relaxed">
               Leads text your listing number. LeadHandler replies instantly, captures their info, and routes the conversation to the right agent — automatically.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14 w-full sm:w-auto">
-              <Button href="/#beta-form" variant="primary" className="w-full sm:w-auto min-h-[44px]">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 w-full sm:w-auto">
+              <Button href="/#beta-form" variant="primary" className="w-full sm:w-auto">
                 Request beta access
               </Button>
-              <Button href="/#how-it-works" variant="ghost" className="w-full sm:w-auto min-h-[44px]">
+              <Button href="/#how-it-works" variant="ghost" className="w-full sm:w-auto">
                 See how it works
               </Button>
             </div>
-            <div className="w-full max-w-4xl hidden sm:block">
+            <p className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-xs text-slate-400 border border-white/10 mt-6">
+              Built for Texas brokerages · Beta · Limited spots · Setup in minutes
+            </p>
+            <div className="w-full max-w-4xl mx-auto mt-16 rounded-2xl border border-white/10 shadow-[0_0_80px_rgba(37,99,235,0.15)] overflow-hidden">
               <DashboardMockup />
             </div>
           </div>
         </div>
       </div>
+      <div
+        className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none"
+        aria-hidden
+      />
     </section>
   );
 }

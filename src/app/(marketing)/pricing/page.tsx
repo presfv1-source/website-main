@@ -109,14 +109,18 @@ export default function PricingPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main>
+        <section className="py-12 md:py-16 bg-gray-950">
+          <div className={cn(CONTAINER, PAGE_PADDING)}>
+            <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+              Simple beta pricing.
+            </h1>
+          </div>
+        </section>
         <FadeUp>
           <section className="py-16 md:py-24 bg-white">
             <div className={cn(CONTAINER, PAGE_PADDING)}>
               <div className="text-center max-w-2xl mx-auto">
                 <SectionLabel className="mb-3">Pricing</SectionLabel>
-                <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight text-[clamp(2.5rem,5vw,4rem)] mb-4">
-                  Simple pricing for serious brokerages.
-                </h1>
                 <p className="font-sans text-gray-500 text-lg">
                   Beta pricing — locked for early members.
                 </p>
@@ -160,12 +164,12 @@ export default function PricingPage() {
                     <div
                       key={plan.id}
                       className={cn(
-                        "rounded-2xl border bg-white p-6 sm:p-8 shadow-sm flex flex-col transition-all hover:border-blue-200 hover:shadow-lg",
-                        plan.featured ? "border-2 border-blue-500 shadow-md relative" : "border-gray-200"
+                        "rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm flex flex-col transition-all hover:shadow-md hover:border-blue-100 relative",
+                        plan.featured && "ring-1 ring-blue-200"
                       )}
                     >
                       {plan.featured && (
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-3 py-1 text-xs font-sans font-medium text-white">
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 text-white text-xs font-semibold px-3 py-1">
                           Most Popular
                         </span>
                       )}
@@ -207,7 +211,7 @@ export default function PricingPage() {
                       )}
                       <Link
                         href="/signup"
-                        className="inline-flex items-center justify-center rounded-xl px-6 py-3 font-sans font-semibold bg-[#2563EB] text-white hover:opacity-90 min-h-[48px] w-full"
+                        className="inline-flex items-center justify-center rounded-full px-6 py-3 font-sans font-semibold bg-blue-600 text-white hover:bg-blue-500 min-h-[48px] w-full transition-all"
                       >
                         Request beta access
                       </Link>

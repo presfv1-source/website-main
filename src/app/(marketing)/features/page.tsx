@@ -183,19 +183,19 @@ export default function FeaturesPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main>
+        <section className="py-12 md:py-16 bg-gray-950">
+          <div className={cn(CONTAINER, PAGE_PADDING)}>
+            <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+              Built for brokerages that can&apos;t afford to miss a lead.
+            </h1>
+          </div>
+        </section>
         <FadeUp>
-          <section className="relative py-16 md:py-24 overflow-hidden">
-            <div
-              className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,#EFF6FF_0%,#FFFFFF_70%)]"
-              aria-hidden
-            />
-            <div className={cn("relative", CONTAINER, PAGE_PADDING)}>
+          <section className="py-16 md:py-24 bg-white">
+            <div className={cn(CONTAINER, PAGE_PADDING)}>
               <div className="text-center max-w-2xl mx-auto">
                 <SectionLabel className="mb-3">Features</SectionLabel>
-                <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight text-[clamp(2.5rem,5vw,4rem)] mb-4">
-                  Built for brokerages that can&apos;t afford to miss a lead.
-                </h1>
-                <p className="font-sans text-gray-500 text-lg leading-relaxed mb-8">
+                <p className="font-sans text-gray-600 text-lg leading-relaxed mb-8">
                   Every feature is designed around one goal — making sure your leads get
                   responded to, routed, and handed to the right agent before your competition even wakes up.
                 </p>
@@ -203,9 +203,12 @@ export default function FeaturesPage() {
                   <Button href="/signup" variant="primary">
                     Request beta access
                   </Button>
-                  <Button href="/pricing" variant="ghost">
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center justify-center rounded-full px-8 py-3.5 font-semibold font-sans text-base border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all min-h-[44px]"
+                  >
                     See pricing →
-                  </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -217,7 +220,7 @@ export default function FeaturesPage() {
             <section
               className={cn(
                 "py-16 md:py-24",
-                i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                i % 2 === 0 ? "bg-white" : "bg-slate-50"
               )}
             >
               <div className={cn(CONTAINER, PAGE_PADDING)}>

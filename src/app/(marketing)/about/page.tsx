@@ -32,26 +32,23 @@ export default function AboutPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main>
+        <section className="py-12 md:py-16 bg-gray-950">
+          <div className={cn(CONTAINER, PAGE_PADDING)}>
+            <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+              Built by someone who gets it.
+            </h1>
+          </div>
+        </section>
         <FadeUp>
-          <section className="py-16 md:py-24 bg-gray-50">
+          <section className="py-16 md:py-24 bg-white">
             <div className={cn(CONTAINER, PAGE_PADDING)}>
-              <div className="text-center max-w-2xl mx-auto">
+              <div className="text-center max-w-2xl mx-auto mb-10">
                 <SectionLabel className="mb-3">About</SectionLabel>
-                <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight text-[clamp(2.5rem,5vw,4rem)] mb-4">
-                  Built by someone who gets it.
-                </h1>
                 <p className="font-sans text-gray-500 text-lg leading-relaxed">
                   LeadHandler.ai was built in Houston by a founder who saw firsthand how
                   brokerages lose leads — and decided to fix it.
                 </p>
               </div>
-            </div>
-          </section>
-        </FadeUp>
-
-        <FadeUp>
-          <section className="py-16 md:py-24 bg-white">
-            <div className={cn(CONTAINER, PAGE_PADDING)}>
               <div className="max-w-3xl mx-auto prose prose-lg font-sans text-gray-500 leading-relaxed space-y-6">
                 <p>
                   Real estate brokerages lose deals every day — not because of bad agents,
@@ -77,13 +74,13 @@ export default function AboutPage() {
         </FadeUp>
 
         <FadeUp>
-          <section className="py-16 md:py-24 bg-gray-50">
+          <section className="py-16 md:py-24 bg-slate-50">
             <div className={cn(CONTAINER, PAGE_PADDING)}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 {VALUES.map((v) => (
                   <div
                     key={v.title}
-                    className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 transition-all hover:border-blue-200 hover:shadow-lg"
+                    className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm transition-all hover:shadow-md hover:border-blue-100"
                   >
                     <p className="text-2xl mb-3" aria-hidden>
                       {v.emoji}
@@ -102,11 +99,7 @@ export default function AboutPage() {
         </FadeUp>
 
         <FadeUp>
-          <section className="relative py-16 md:py-24 overflow-hidden">
-            <div
-              className="absolute inset-0 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500"
-              aria-hidden
-            />
+          <section className="relative py-16 md:py-24 overflow-hidden bg-gray-950">
             <div className={cn("relative", CONTAINER, PAGE_PADDING)}>
               <div className="text-center max-w-2xl mx-auto">
                 <h2 className="font-display font-bold text-3xl sm:text-4xl text-white mb-4 tracking-tight">

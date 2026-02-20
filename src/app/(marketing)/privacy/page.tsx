@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MarketingHeader } from "@/components/app/MarketingHeader";
 import { MarketingFooter } from "@/components/app/MarketingFooter";
-import { CONTAINER_NARROW, PAGE_PADDING, TYPO } from "@/lib/ui";
+import { CONTAINER_NARROW, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
 export default function PrivacyPage() {
@@ -9,13 +9,20 @@ export default function PrivacyPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <MarketingHeader />
 
+      <section className="py-12 md:py-16 bg-gray-950">
+        <div className={cn(CONTAINER_NARROW, PAGE_PADDING)}>
+          <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+            Privacy
+          </h1>
+        </div>
+      </section>
+
       <main className={cn(CONTAINER_NARROW, PAGE_PADDING, "flex-1 py-12 md:py-16")}>
-        <h1 className={cn(TYPO.h1, "text-3xl md:text-4xl")}>Privacy</h1>
-        <p className={cn(TYPO.muted, "mt-2")}>
+        <p className="text-gray-600 leading-relaxed mt-2">
           How we collect, use, and protect your information.
         </p>
 
-        <section className="mt-8 space-y-6 text-sm text-foreground">
+        <section className="mt-8 space-y-6 text-sm text-gray-600 leading-relaxed">
           <p>
             LeadHandler.ai (&quot;we&quot;) processes data you provide when using our service, including brokerage and agent information, lead and contact data, and messages. We use this to deliver SMS lead response and routing, dashboard visibility, and billing.
           </p>
@@ -30,7 +37,7 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <p className={cn(TYPO.muted, "mt-10 text-center text-sm")}>
+        <p className="text-gray-600 mt-10 text-center text-sm">
           <Link href="/contact" className="font-medium text-primary hover:underline">
             Contact us
           </Link>

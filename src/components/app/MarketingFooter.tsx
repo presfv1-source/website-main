@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CONTAINER, PAGE_PADDING, TYPO } from "@/lib/ui";
+import { Zap } from "lucide-react";
+import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
 const productLinks = [
@@ -7,6 +8,12 @@ const productLinks = [
   { href: "/how-it-works", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
   { href: "/demo", label: "Demo" },
+] as const;
+
+const companyLinks = [
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+  { href: "/security", label: "Security" },
 ] as const;
 
 const legalLinks = [
@@ -18,18 +25,33 @@ export function MarketingFooter({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "mt-16 sm:mt-24 border-t border-border py-10 sm:py-12",
+        "mt-16 sm:mt-24 bg-gray-950 border-t border-white/10 py-10 sm:py-12",
         className
       )}
     >
       <div className={cn(CONTAINER, PAGE_PADDING)}>
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-8 sm:gap-12 sm:justify-between mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-8">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 font-display font-bold text-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+            >
+              <Zap className="h-5 w-5 text-blue-500" aria-hidden />
+              LeadHandler.ai
+            </Link>
+            <p className="mt-3 text-sm text-slate-400 max-w-xs font-sans leading-relaxed">
+              SMS lead response and routing for real estate brokerages.
+            </p>
+          </div>
           <div>
-            <p className={cn(TYPO.mutedSmall, "font-medium text-foreground mb-3")}>Product</p>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Product</p>
             <ul className="flex flex-col gap-2">
               {productLinks.map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href} className={cn(TYPO.mutedSmall, "block py-1.5 min-h-[44px] sm:min-h-0 sm:py-0 flex items-center hover:text-foreground hover:underline")}>
+                  <Link
+                    href={href}
+                    className="text-sm font-sans text-slate-400 hover:text-white transition-colors"
+                  >
                     {label}
                   </Link>
                 </li>
@@ -37,32 +59,44 @@ export function MarketingFooter({ className }: { className?: string }) {
             </ul>
           </div>
           <div>
-            <p className={cn(TYPO.mutedSmall, "font-medium text-foreground mb-3")}>Legal</p>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Company</p>
+            <ul className="flex flex-col gap-2">
+              {companyLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-sm font-sans text-slate-400 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Legal</p>
             <ul className="flex flex-col gap-2">
               {legalLinks.map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href} className={cn(TYPO.mutedSmall, "block py-1.5 min-h-[44px] sm:min-h-0 sm:py-0 flex items-center hover:text-foreground hover:underline")}>
+                  <Link
+                    href={href}
+                    className="text-sm font-sans text-slate-400 hover:text-white transition-colors"
+                  >
                     {label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-          <div>
-            <p className={cn(TYPO.mutedSmall, "font-medium text-foreground mb-3")}>Contact</p>
-            <ul className="flex flex-col gap-2">
-              <li>
-                <Link href="/contact" className={cn(TYPO.mutedSmall, "block py-1.5 min-h-[44px] sm:min-h-0 sm:py-0 flex items-center hover:text-foreground hover:underline")}>
-                  Contact us
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
-        <p className={cn(TYPO.mutedSmall, "text-muted-foreground text-center sm:text-left border-t border-border pt-6")}>
-          {/* was: Houston, TX */}
-          © 2026 LeadHandler.ai · United States
-        </p>
+        <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-500">
+          <p className="text-center sm:text-left">
+            © 2026 LeadHandler.ai · Houston, TX
+          </p>
+          <p className="text-center sm:text-right">
+            Built for real estate brokerages.
+          </p>
+        </div>
       </div>
     </footer>
   );

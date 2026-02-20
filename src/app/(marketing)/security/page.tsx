@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Shield, Lock, Server } from "lucide-react";
 import { MarketingHeader } from "@/components/app/MarketingHeader";
 import { MarketingFooter } from "@/components/app/MarketingFooter";
-import { CONTAINER_NARROW, PAGE_PADDING, TYPO } from "@/lib/ui";
+import { CONTAINER_NARROW, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
 const sections: Array<{
@@ -34,9 +34,16 @@ export default function SecurityPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <MarketingHeader />
 
+      <section className="py-12 md:py-16 bg-gray-950">
+        <div className={cn(CONTAINER_NARROW, PAGE_PADDING)}>
+          <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+            Security & data
+          </h1>
+        </div>
+      </section>
+
       <main className={cn(CONTAINER_NARROW, PAGE_PADDING, "flex-1 py-12 md:py-16")}>
-        <h1 className={cn(TYPO.h1, "text-3xl md:text-4xl")}>Security & data</h1>
-        <p className={cn(TYPO.muted, "mt-2")}>
+        <p className="text-gray-600 leading-relaxed mt-2">
           How we handle your brokerage data and the vendors we use to run the service.
         </p>
 
@@ -45,13 +52,13 @@ export default function SecurityPage() {
             <div key={title} className="flex gap-4">
               <Icon className="size-8 shrink-0 text-primary" aria-hidden />
               <div>
-                <h2 className={cn(TYPO.h3)}>{title}</h2>
-                <p className={cn(TYPO.muted, "mt-2 text-sm")}>{body}</p>
+                <h2 className="font-semibold text-gray-900">{title}</h2>
+                <p className="text-gray-600 text-sm leading-relaxed mt-2">{body}</p>
                 {list && (
-                  <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                  <ul className="mt-4 space-y-2 text-sm text-gray-600">
                     {list.map(({ name, desc }) => (
                       <li key={name}>
-                        <strong className="text-foreground">{name}</strong> — {desc}
+                        <strong className="text-gray-900">{name}</strong> — {desc}
                       </li>
                     ))}
                   </ul>
@@ -61,7 +68,7 @@ export default function SecurityPage() {
           ))}
         </section>
 
-        <p className={cn(TYPO.muted, "mt-10 text-center text-sm")}>
+        <p className="text-gray-600 mt-10 text-center text-sm">
           Questions?{" "}
           <Link href="/contact" className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded">
             Contact us

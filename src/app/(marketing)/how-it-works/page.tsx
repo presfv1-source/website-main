@@ -19,13 +19,17 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
+      <section className="py-12 md:py-16 bg-gray-950">
+        <div className={cn(CONTAINER, PAGE_PADDING)}>
+          <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+            From first text to agent in seconds.
+          </h1>
+        </div>
+      </section>
       <main className={cn(CONTAINER, PAGE_PADDING, "flex-1 py-16 md:py-24")}>
         <div className="max-w-2xl mx-auto text-center mb-14">
           <SectionLabel className="mb-3">How it works</SectionLabel>
-          <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight text-[clamp(2rem,4vw,3rem)] mb-4">
-            From first text to agent in seconds.
-          </h1>
-          <p className="font-sans text-gray-500 text-lg leading-relaxed">
+          <p className="font-sans text-gray-600 text-lg leading-relaxed">
             From first text to routed conversation — all logged.
           </p>
         </div>
@@ -55,7 +59,7 @@ export default function HowItWorksPage() {
         <div className="mt-14 text-center">
           <Link
             href="/demo"
-            className="inline-flex items-center justify-center rounded-xl px-6 py-3 font-sans font-semibold bg-[#2563EB] text-white hover:opacity-90 min-h-[48px]"
+            className="inline-flex items-center justify-center rounded-full px-8 py-3.5 font-sans font-semibold bg-blue-600 text-white hover:bg-blue-500 min-h-[48px] transition-all"
           >
             Try demo →
           </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Zap } from "lucide-react";
 import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
@@ -24,29 +25,29 @@ const legalLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white py-12 md:py-16">
+    <footer className="bg-gray-950 border-t border-white/10 py-12 md:py-16">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
           <div className="sm:col-span-2 lg:col-span-1">
             <Link
               href="/"
-              className="font-display font-bold text-xl text-[#0A0A0A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+              className="flex items-center gap-1.5 font-display font-bold text-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
             >
-              LeadHandler<span className="text-blue-600">.ai</span>
+              <Zap className="h-5 w-5 text-blue-500" aria-hidden />
+              LeadHandler.ai
             </Link>
-            <p className="mt-3 text-sm text-gray-500 max-w-xs font-sans leading-relaxed">
+            <p className="mt-3 text-sm text-slate-400 max-w-xs font-sans leading-relaxed">
               SMS lead response and routing for real estate brokerages.
             </p>
-            <p className="mt-2 text-sm text-gray-500 font-sans">Houston, TX</p>
           </div>
           <div>
-            <p className="text-sm font-sans font-bold text-[#0A0A0A] mb-3">Product</p>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Product</p>
             <ul className="flex flex-col gap-2">
               {productLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm font-sans text-gray-500 hover:text-[#0A0A0A] transition-colors"
+                    className="text-sm font-sans text-slate-400 hover:text-white transition-colors"
                   >
                     {label}
                   </Link>
@@ -55,13 +56,13 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <p className="text-sm font-sans font-bold text-[#0A0A0A] mb-3">Company</p>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Company</p>
             <ul className="flex flex-col gap-2">
               {companyLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm font-sans text-gray-500 hover:text-[#0A0A0A] transition-colors"
+                    className="text-sm font-sans text-slate-400 hover:text-white transition-colors"
                   >
                     {label}
                   </Link>
@@ -70,13 +71,13 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <p className="text-sm font-sans font-bold text-[#0A0A0A] mb-3">Legal</p>
+            <p className="text-sm font-sans font-semibold text-white mb-3">Legal</p>
             <ul className="flex flex-col gap-2">
               {legalLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm font-sans text-gray-500 hover:text-[#0A0A0A] transition-colors"
+                    className="text-sm font-sans text-slate-400 hover:text-white transition-colors"
                   >
                     {label}
                   </Link>
@@ -85,11 +86,11 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="pt-8 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <p className="text-sm font-sans text-gray-500 text-center sm:text-left">
+        <div className="border-t border-white/5 mt-8 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-500">
+          <p className="text-center sm:text-left">
             © 2026 LeadHandler.ai · Houston, TX
           </p>
-          <p className="text-sm font-sans text-gray-500 text-center sm:text-right">
+          <p className="text-center sm:text-right">
             Built for real estate brokerages.
           </p>
         </div>

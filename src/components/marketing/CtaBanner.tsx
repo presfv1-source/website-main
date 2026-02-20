@@ -30,13 +30,13 @@ export function CtaBanner() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center rounded-xl px-8 py-3 font-sans font-semibold bg-white text-blue-600 hover:bg-white/90 min-h-[48px]"
+              className="inline-flex items-center justify-center rounded-full px-8 py-3.5 font-sans font-semibold bg-white text-blue-600 hover:bg-white/90 min-h-[48px] transition-all"
             >
               Request beta access
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center rounded-xl px-8 py-3 font-sans font-semibold border-2 border-white text-white hover:bg-white/10 min-h-[48px]"
+              className="inline-flex items-center justify-center rounded-full px-8 py-3.5 font-sans font-semibold border-2 border-white text-white hover:bg-white/10 min-h-[48px] transition-all"
             >
               Talk to sales
             </Link>

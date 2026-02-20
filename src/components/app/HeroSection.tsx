@@ -40,34 +40,32 @@ const FAKE_TIMELINE = [
 
 export function HeroSection() {
   return (
-    <section className="relative py-20 md:py-28 px-4 md:px-8 overflow-hidden">
+    <section className="relative py-20 md:py-28 px-4 md:px-8 overflow-hidden bg-gray-950">
       <div
-        className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-burnt-orange/5"
+        className="absolute inset-0 bg-gradient-to-b from-gray-950 to-gray-900/95"
         aria-hidden
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,var(--primary)/8%,transparent)]" aria-hidden />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_60%,var(--burnt-orange)/6%,transparent)]" aria-hidden />
 
       <div className="relative container max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-          <h1 className="text-[clamp(1.75rem,5vw,3rem)] sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-foreground">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 text-white leading-[1.05]">
             {MARKETING_POSITIONING.headline}
           </h1>
-          <p className="text-base sm:text-xl text-muted-foreground mb-10">
+          <p className="text-base sm:text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
             {MARKETING_POSITIONING.subheadline}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="w-full sm:w-auto text-base min-h-[44px] hover:ring-2 hover:ring-burnt-orange/40 hover:ring-offset-2">
+            <Button asChild size="lg" className="w-full sm:w-auto rounded-full px-8 py-3.5 font-semibold bg-blue-600 text-white hover:bg-blue-500">
               <Link href="/demo">Try demo</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-base min-h-[44px]">
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto rounded-full px-8 py-3.5 font-semibold border-slate-600 text-slate-300 hover:border-slate-400 hover:bg-white/5">
               <Link href="/#pricing">View pricing</Link>
             </Button>
           </div>
         </div>
 
-        <div className="relative mx-auto max-w-6xl min-w-0 hidden sm:block">
-          <div className="rounded-xl border border-border/80 bg-card/95 shadow-lg shadow-primary/10 overflow-hidden ring-1 ring-black/5 min-w-0">
+        <div className="relative mx-auto max-w-6xl min-w-0 hidden sm:block rounded-2xl border border-white/10 shadow-[0_0_80px_rgba(37,99,235,0.15)] overflow-hidden">
+          <div className="rounded-2xl border border-white/10 bg-card/95 shadow-lg overflow-hidden min-w-0">
             {USE_DASHBOARD_IMAGE ? (
               <Image
                 src={DASHBOARD_IMAGE_PATH}

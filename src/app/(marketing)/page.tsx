@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/marketing/Navbar";
 import { Hero } from "@/components/marketing/Hero";
-import { TrustBar } from "@/components/marketing/TrustBar";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { WhyThisMatters } from "@/components/marketing/WhyThisMatters";
 import { Features } from "@/components/marketing/Features";
@@ -22,9 +21,6 @@ export default function MarketingHomePage() {
       <main>
         <FadeUp>
           <Hero />
-        </FadeUp>
-        <FadeUp>
-          <TrustBar />
         </FadeUp>
         <FadeUp>
           <HowItWorks />

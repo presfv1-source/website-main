@@ -13,15 +13,19 @@ export default function DemoPage() {
       <Navbar />
 
       <main className="flex-1">
-        <section className={cn(CONTAINER, PAGE_PADDING, "pt-10 pb-6")}>
-          <div className="max-w-3xl mx-auto text-center mb-10">
-            <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight text-[clamp(2rem,4vw,3rem)] mb-3">
+        <section className="py-12 md:py-16 bg-gray-950">
+          <div className={cn(CONTAINER, PAGE_PADDING)}>
+            <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
               See LeadHandler in action
             </h1>
-            <p className="font-sans text-gray-500 text-lg mb-8">
+          </div>
+        </section>
+        <section className={cn(CONTAINER, PAGE_PADDING, "py-16 md:py-24 bg-white")}>
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="font-sans text-gray-600 text-lg mb-8">
               Request beta access and we&apos;ll walk you through a live demo personally.
             </p>
-            <Button asChild size="lg" className="min-h-[48px] rounded-xl bg-[#2563EB] hover:opacity-90">
+            <Button asChild size="lg" className="min-h-[48px] rounded-full px-8 py-3.5 font-semibold bg-blue-600 hover:bg-blue-500">
               <Link href="/signup">Request beta access</Link>
             </Button>
           </div>

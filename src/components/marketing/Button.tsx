@@ -21,12 +21,12 @@ export function Button({
   onClick?: () => void;
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold font-sans transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
+    "inline-flex items-center justify-center rounded-full px-8 py-3.5 font-semibold font-sans text-base transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
   const styles = {
     primary:
-      "bg-[#2563EB] text-white hover:opacity-90",
+      "bg-blue-600 text-white hover:bg-blue-500",
     ghost:
-      "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50",
+      "border border-slate-600 text-slate-300 hover:border-slate-400 bg-transparent",
   };
   const combined = cn(base, styles[variant], className);
 

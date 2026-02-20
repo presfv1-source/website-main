@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { FadeUp } from "@/components/marketing/FadeUp";
@@ -39,7 +40,10 @@ export default function ContactPage() {
         }),
       });
       const data = await res.json();
-      if (data.success !== false) setSubmitted(true);
+      if (data.success !== false) {
+        setSubmitted(true);
+        toast.success("Message sent! We'll be in touch within a few hours.");
+      }
       else setError((data.error as { message?: string })?.message ?? "Something went wrong. Email us at hello@leadhandler.ai.");
     } catch {
       setError("Could not send. Email us at hello@leadhandler.ai.");
@@ -262,10 +266,10 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-[#0A0A0A] mb-2">
-                    Is there a free trial?
+                    How do I get beta access?
                   </h3>
                   <p className="font-sans text-gray-500 text-sm leading-relaxed">
-                    14 days, full access, no credit card required.
+                    Request access via the signup page. We&apos;re onboarding a limited number of brokerages during beta.
                   </p>
                 </div>
               </div>

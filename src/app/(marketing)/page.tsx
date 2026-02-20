@@ -12,7 +12,7 @@ import { FadeUp } from "@/components/marketing/FadeUp";
 export const metadata = {
   title: "LeadHandler.ai — Respond first. Close more.",
   description:
-    "AI-powered SMS lead qualification and routing for real estate brokerages.",
+    "SMS lead response and routing for real estate brokerages. Request beta access.",
 };
 
 export default function MarketingHomePage() {

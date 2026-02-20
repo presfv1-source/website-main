@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageSquare, Route, Users } from "lucide-react";
+import { MessageSquare, Route, Users, LayoutDashboard } from "lucide-react";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { SectionLabel } from "@/components/marketing/SectionLabel";
@@ -7,12 +7,12 @@ import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 import { HOW_IT_WORKS_STEPS } from "@/lib/marketingContent";
 
-const stepIcons = [Users, MessageSquare, Route];
+const stepIcons = [Users, MessageSquare, Route, LayoutDashboard];
 
 export const metadata = {
   title: "LeadHandler.ai — How it works",
   description:
-    "AI-powered SMS lead qualification and routing for real estate brokerages. Capture, engage, qualify, and route.",
+    "SMS lead response and routing for real estate brokerages. From first text to routed conversation — all logged.",
 };
 
 export default function HowItWorksPage() {
@@ -23,10 +23,10 @@ export default function HowItWorksPage() {
         <div className="max-w-2xl mx-auto text-center mb-14">
           <SectionLabel className="mb-3">How it works</SectionLabel>
           <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight text-[clamp(2rem,4vw,3rem)] mb-4">
-            From new lead to booked appointment — automatically.
+            From first text to agent in seconds.
           </h1>
           <p className="font-sans text-gray-500 text-lg leading-relaxed">
-            Capture, engage, qualify, and route — so your team closes more.
+            From first text to routed conversation — all logged.
           </p>
         </div>
 

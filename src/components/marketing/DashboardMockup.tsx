@@ -8,9 +8,9 @@ const STATS = [
 ];
 
 const LEADS = [
-  { name: "James R.", source: "Zillow", status: "Hot" as const },
-  { name: "Maria S.", source: "Realtor.com", status: "Warm" as const },
-  { name: "David K.", source: "Direct", status: "New" as const },
+  { name: "James R.", source: "Listing", status: "Hot" as const },
+  { name: "Maria S.", source: "Direct", status: "Warm" as const },
+  { name: "David K.", source: "Referral", status: "New" as const },
 ];
 
 const NAV_ITEMS = [

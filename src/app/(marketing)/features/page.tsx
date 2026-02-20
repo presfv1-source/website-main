@@ -3,11 +3,9 @@
 import Link from "next/link";
 import {
   MessageSquare,
-  Target,
   Route,
   LayoutDashboard,
   Inbox,
-  Shield,
 } from "lucide-react";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
@@ -21,55 +19,46 @@ import { cn } from "@/lib/utils";
 const FEATURES = [
   {
     id: "sms",
-    title: "AI-Powered SMS Inbox",
-    copy: "Every lead gets an instant response — even at 2am. Our AI handles first contact, qualifies intent, and flags hot prospects so your agents only talk to leads that are ready.",
-    tags: ["Instant response", "24/7 coverage", "Shared team inbox"],
+    title: "Instant text-back",
+    copy: "Every lead gets a reply in seconds, automatically.",
+    tags: ["Instant response", "24/7", "Automatic"],
     illustration: "left",
-  },
-  {
-    id: "qualification",
-    title: "Lead Qualification Engine",
-    copy: "The AI asks the right questions — timeline, budget, motivation, buyer vs seller. Every lead gets a qualification score so agents know exactly who to prioritize.",
-    tags: ["AI scoring", "Buyer/seller detection", "Priority flagging"],
-    illustration: "right",
   },
   {
     id: "routing",
-    title: "Smart Routing",
-    copy: "Round-robin, weighted, or performance-based — leads go to the right agent automatically. No manager in the middle. No confusion about who's following up.",
-    tags: ["Round-robin", "Weighted routing", "Escalation"],
-    illustration: "left",
+    title: "Smart routing",
+    copy: "Round-robin or rules-based. Right agent gets the right lead.",
+    tags: ["Round-robin", "Rules-based", "Escalation"],
+    illustration: "right",
   },
   {
-    id: "dashboard",
-    title: "Brokerage Dashboard",
-    copy: "One view for everything. Today's leads, response times, agent activity, conversion pipeline. Broker-owners get full visibility without micromanaging.",
-    tags: ["Live metrics", "Agent performance", "Conversion tracking"],
-    illustration: "right",
+    id: "escalation",
+    title: "Missed-lead prevention",
+    copy: "No lead sits unanswered. Escalation alerts if no response.",
+    tags: ["Alerts", "No lead left behind"],
+    illustration: "left",
   },
   {
     id: "inbox",
-    title: "Shared Inbox",
-    copy: "One inbox for every conversation. Every agent sees their assigned leads. Every message is logged. No more leads buried in personal texts.",
+    title: "Shared inbox",
+    copy: "Every SMS conversation in one place. Handoffs without the chaos.",
     tags: ["Threaded SMS", "Message history", "Status tracking"],
+    illustration: "right",
+  },
+  {
+    id: "dashboard",
+    title: "Owner visibility",
+    copy: "See every lead, every response, every agent. Full accountability.",
+    tags: ["Live metrics", "Agent performance", "Full visibility"],
     illustration: "left",
   },
   {
-    id: "roles",
-    title: "Roles & Permissions",
-    copy: "Owners see everything. Agents see only their leads. Clean separation that keeps your team focused and your data secure.",
-    tags: ["Owner role", "Agent role", "Secure access"],
+    id: "setup",
+    title: "Simple setup",
+    copy: "One phone number. A few routing rules. Live in minutes.",
+    tags: ["One number", "Quick setup", "Live in minutes"],
     illustration: "right",
   },
-];
-
-const INTEGRATIONS = [
-  { name: "Zillow", desc: "Lead sync", letter: "Z", color: "bg-amber-100 text-amber-800" },
-  { name: "Realtor.com", desc: "Lead sync", letter: "R", color: "bg-blue-100 text-blue-800" },
-  { name: "Twilio", desc: "SMS delivery", letter: "T", color: "bg-red-100 text-red-800" },
-  { name: "Airtable", desc: "CRM & data", letter: "A", color: "bg-amber-100 text-amber-800" },
-  { name: "Stripe", desc: "Billing", letter: "S", color: "bg-indigo-100 text-indigo-800" },
-  { name: "Make.com", desc: "Automation", letter: "M", color: "bg-emerald-100 text-emerald-800" },
 ];
 
 function SmsMockup() {
@@ -91,21 +80,6 @@ function SmsMockup() {
             How about tomorrow at 2pm?
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function ScoreMockup() {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-lg max-w-xs">
-      <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2 font-sans">
-        Lead score
-      </p>
-      <p className="font-display text-4xl font-bold text-[#0A0A0A] mb-1">82</p>
-      <p className="text-sm font-sans text-gray-500 mb-3">Hot · Buyer</p>
-      <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-        <div className="h-full w-[82%] rounded-full bg-blue-500" />
       </div>
     </div>
   );
@@ -156,7 +130,7 @@ function InboxMockup() {
         <p className="text-xs font-sans font-medium text-gray-600">Inbox</p>
       </div>
       <div className="divide-y divide-gray-100">
-        {["James R. · Zillow", "Maria S. · Realtor.com", "David K. · Direct"].map((row) => (
+        {["James R. · Listing", "Maria S. · Direct", "David K. · Referral"].map((row) => (
           <div key={row} className="px-4 py-3 text-sm font-sans text-[#0A0A0A]">
             {row}
           </div>
@@ -166,17 +140,30 @@ function InboxMockup() {
   );
 }
 
-function RoleMockup() {
+function EscalationMockup() {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg max-w-xs">
-      <p className="text-xs font-sans font-medium text-gray-500 mb-2">Role</p>
+      <p className="text-xs font-sans font-medium text-gray-500 mb-2">Escalation</p>
       <div className="space-y-2">
-        <div className="rounded-lg bg-blue-50 px-3 py-2 text-sm font-sans font-medium text-blue-600">
-          Owner
+        <div className="rounded-lg bg-amber-50 px-3 py-2 text-sm font-sans text-amber-800">
+          No reply in 15m → alert
         </div>
-        <div className="rounded-lg bg-gray-50 px-3 py-2 text-sm font-sans text-gray-500">
-          Agent
+        <div className="rounded-lg bg-gray-50 px-3 py-2 text-sm font-sans text-gray-600">
+          Lead never sits unanswered
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SetupMockup() {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg max-w-xs">
+      <p className="text-xs font-sans font-medium text-gray-500 mb-2">Setup</p>
+      <div className="space-y-2 text-sm font-sans text-gray-600">
+        <p>1. Add your number</p>
+        <p>2. Set routing rules</p>
+        <p>3. Go live in minutes</p>
       </div>
     </div>
   );
@@ -184,11 +171,11 @@ function RoleMockup() {
 
 const ILLUSTRATIONS: Record<string, React.ReactNode> = {
   sms: <SmsMockup />,
-  qualification: <ScoreMockup />,
   routing: <RoutingMockup />,
+  escalation: <EscalationMockup />,
   dashboard: <DashboardMiniMockup />,
   inbox: <InboxMockup />,
-  roles: <RoleMockup />,
+  setup: <SetupMockup />,
 };
 
 export default function FeaturesPage() {
@@ -214,7 +201,7 @@ export default function FeaturesPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button href="/signup" variant="primary">
-                    Start free trial
+                    Request beta access
                   </Button>
                   <Button href="/pricing" variant="ghost">
                     See pricing →
@@ -269,35 +256,6 @@ export default function FeaturesPage() {
             </section>
           </FadeUp>
         ))}
-
-        <FadeUp>
-          <section className="py-16 md:py-24 bg-gray-50 border-t border-gray-200">
-            <div className={cn(CONTAINER, PAGE_PADDING)}>
-              <h2 className="font-display font-bold text-[#0A0A0A] text-2xl mb-10 text-center">
-                Connects to the tools you already use.
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {INTEGRATIONS.map((int) => (
-                  <div
-                    key={int.name}
-                    className="rounded-2xl border border-gray-200 bg-white p-4 text-center transition-all hover:border-blue-200 hover:shadow-lg"
-                  >
-                    <div
-                      className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center text-lg font-display font-bold mx-auto mb-2",
-                        int.color
-                      )}
-                    >
-                      {int.letter}
-                    </div>
-                    <p className="font-sans font-semibold text-[#0A0A0A] text-sm">{int.name}</p>
-                    <p className="font-sans text-xs text-gray-500 mt-0.5">{int.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </FadeUp>
 
         <FadeUp>
           <CtaBanner />

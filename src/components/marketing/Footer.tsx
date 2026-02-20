@@ -5,7 +5,7 @@ import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 
 const productLinks = [
-  { href: "/#how", label: "How it works" },
+  { href: "/#how-it-works", label: "How it works" },
   { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
   { href: "/demo", label: "Demo" },
@@ -35,7 +35,7 @@ export function Footer() {
               LeadHandler<span className="text-blue-600">.ai</span>
             </Link>
             <p className="mt-3 text-sm text-gray-500 max-w-xs font-sans leading-relaxed">
-              AI-powered SMS lead qualification and routing for real estate brokerages.
+              SMS lead response and routing for real estate brokerages.
             </p>
             <p className="mt-2 text-sm text-gray-500 font-sans">Houston, TX</p>
           </div>

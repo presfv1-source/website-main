@@ -9,8 +9,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { href: "/#how", label: "How it works" },
+  { href: "/#how-it-works", label: "How it works" },
   { href: "/#features", label: "Features" },
+  { href: "/about", label: "About" },
   { href: "/#pricing", label: "Pricing" },
 ] as const;
 
@@ -69,7 +70,7 @@ export function Navbar() {
             href="/signup"
             className="inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold font-sans bg-[#2563EB] text-white hover:opacity-90 min-h-[40px]"
           >
-            Start free trial
+            Request beta access
           </Link>
         </div>
 
@@ -109,7 +110,7 @@ export function Navbar() {
                   href="/signup"
                   className="mt-2 inline-flex items-center justify-center min-h-[44px] rounded-xl bg-[#2563EB] px-4 py-3 text-sm font-semibold text-white hover:opacity-90"
                 >
-                  Start free trial
+                  Request beta access
                 </Link>
               </nav>
             </SheetContent>

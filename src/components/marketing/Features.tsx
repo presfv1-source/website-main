@@ -4,9 +4,9 @@ import {
   MessageSquare,
   LayoutDashboard,
   Route,
-  Target,
-  Plug,
-  Shield,
+  Bell,
+  Inbox,
+  Zap,
 } from "lucide-react";
 import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
@@ -14,52 +14,40 @@ import { SectionLabel } from "./SectionLabel";
 
 const FEATURES = [
   {
-    title: "AI SMS Inbox",
+    title: "Instant text-back",
     description:
-      "Instant response, 24/7 coverage, shared inbox with tags so your team never misses a lead.",
+      "Every lead gets a reply in seconds, automatically.",
     icon: MessageSquare,
-    large: true,
-    tag: "Core",
   },
   {
-    title: "Dashboard",
+    title: "Smart routing",
     description:
-      "Full visibility for broker-owners. See every lead, reply time, and conversion at a glance.",
-    icon: LayoutDashboard,
-    large: false,
-    tag: null,
-  },
-  {
-    title: "Smart Routing",
-    description:
-      "Round-robin, weighted, or performance-based. Route to the right agent every time.",
+      "Round-robin or rules-based. Right agent gets the right lead.",
     icon: Route,
-    large: false,
-    tag: null,
   },
   {
-    title: "Lead Score",
+    title: "Missed-lead prevention",
     description:
-      "AI scores timeline, budget, and motivation so hot leads get priority.",
-    icon: Target,
-    large: false,
-    tag: null,
+      "No lead sits unanswered. Escalation alerts if no response.",
+    icon: Bell,
   },
   {
-    title: "Integrations",
+    title: "Shared inbox",
     description:
-      "Zillow, Realtor.com, Twilio, Airtable. Connect your existing tools.",
-    icon: Plug,
-    large: false,
-    tag: null,
+      "Every SMS conversation in one place. Handoffs without the chaos.",
+    icon: Inbox,
   },
   {
-    title: "Roles & Permissions",
+    title: "Owner visibility",
     description:
-      "Owner vs agent views. Owners control routing; agents see only their leads.",
-    icon: Shield,
-    large: false,
-    tag: null,
+      "See every lead, every response, every agent. Full accountability.",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Simple setup",
+    description:
+      "One phone number. A few routing rules. Live in minutes.",
+    icon: Zap,
   },
 ];
 
@@ -79,20 +67,10 @@ export function Features() {
             return (
               <div
                 key={f.title}
-                className={cn(
-                  "rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-lg",
-                  f.large && "md:col-span-2"
-                )}
+                className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-lg"
               >
-                <div className="flex items-start justify-between gap-2 mb-4">
-                  <div className="rounded-xl bg-blue-50 w-12 h-12 flex items-center justify-center shrink-0">
-                    <Icon className="h-6 w-6 text-blue-600" aria-hidden />
-                  </div>
-                  {f.tag && (
-                    <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-sans font-medium text-blue-600">
-                      {f.tag}
-                    </span>
-                  )}
+                <div className="rounded-xl bg-blue-50 w-12 h-12 flex items-center justify-center shrink-0 mb-4">
+                  <Icon className="h-6 w-6 text-blue-600" aria-hidden />
                 </div>
                 <h3 className="font-display font-semibold text-[#0A0A0A] text-[1.15rem] mb-2">
                   {f.title}

@@ -25,22 +25,21 @@ export function Hero() {
                 Now in Beta — 12 spots remaining
               </span>
             </div>
-            <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight mb-6 leading-[1.1] text-[clamp(3rem,7vw,5.5rem)]">
-              Respond first. Close more.
+            <h1 className="font-display font-extrabold text-[#0A0A0A] tracking-tight mb-6 leading-[1.1] text-[clamp(1.75rem,6vw,5.5rem)]">
+              Every text lead answered in seconds — routed to the right agent.
             </h1>
-            <p className="text-lg sm:text-xl font-sans text-gray-500 leading-relaxed mb-10 max-w-2xl">
-              LeadHandler.ai qualifies every inbound lead by SMS, routes them to the right
-              agent, and gives your brokerage the visibility it&apos;s been missing.
+            <p className="text-base sm:text-lg md:text-xl font-sans text-gray-500 leading-relaxed mb-10 max-w-2xl">
+              Leads text your listing number. We reply instantly, collect the basics, and route the conversation to the right agent — all logged so nothing falls through.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
-              <Button href="/signup" variant="primary">
-                Start free trial
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14 w-full sm:w-auto">
+              <Button href="/signup" variant="primary" className="w-full sm:w-auto min-h-[44px]">
+                Request beta access
               </Button>
-              <Button href="/demo" variant="ghost">
-                See live demo →
+              <Button href="/#how-it-works" variant="ghost" className="w-full sm:w-auto min-h-[44px]">
+                See how it works
               </Button>
             </div>
-            <div className="w-full max-w-4xl">
+            <div className="w-full max-w-4xl hidden sm:block">
               <DashboardMockup />
             </div>
           </div>

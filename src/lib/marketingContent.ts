@@ -4,9 +4,9 @@
  */
 
 export const MARKETING_POSITIONING = {
-  headline: "Automatically engage, qualify, and route every new lead",
+  headline: "Every text lead answered in seconds — routed to the right agent.",
   subheadline:
-    "LeadHandler instantly responds to new leads via SMS, asks key questions to identify serious buyers, and routes qualified prospects to the right agent — so your team closes more without manual follow-up.",
+    "Leads text your listing number. We reply instantly, collect the basics, and route the conversation to the right agent — all logged so nothing falls through.",
   valueProps: [
     "Instant SMS follow-up to every new lead",
     "Automated lead filtering and routing",
@@ -18,16 +18,20 @@ export const MARKETING_POSITIONING = {
 
 export const HOW_IT_WORKS_STEPS = [
   {
-    title: "Capture",
-    body: "New leads appear in your dashboard automatically so nothing slips through.",
+    title: "Lead texts your listing number",
+    body: "Leads text your listing or team number. Captured instantly.",
   },
   {
-    title: "Engage & qualify",
-    body: "Instant SMS follow-up asks key questions to identify serious buyers and filter low-intent inquiries.",
+    title: "Instant auto-reply collects name, interest, and timing",
+    body: "We reply in seconds and collect the basics so agents have context.",
   },
   {
-    title: "Route & track",
-    body: "Qualified leads are assigned using your routing rules, with full visibility and status tracking.",
+    title: "Routed to the right agent based on your rules",
+    body: "Round-robin or rules-based. The right agent gets the conversation.",
+  },
+  {
+    title: "Everything logged — broker sees every conversation",
+    body: "Full visibility in one place. No lead falls through.",
   },
 ] as const;
 
@@ -122,7 +126,7 @@ export const PRICING_PLANS_BETA: PricingPlan[] = [
       "SMS inbox",
       "Basic dashboard",
     ],
-    cta: "Claim Beta Spot",
+    cta: "Request beta access",
     href: "/signup",
     primary: false,
     priceIdEnvKey: "NEXT_PUBLIC_STRIPE_PRICE_ID_ESSENTIALS",
@@ -145,7 +149,7 @@ export const PRICING_PLANS_BETA: PricingPlan[] = [
       "Analytics dashboard",
       "Priority support",
     ],
-    cta: "Claim Beta Spot",
+    cta: "Request beta access",
     href: "/signup",
     primary: true,
     priceIdEnvKey: "NEXT_PUBLIC_STRIPE_PRICE_ID_PRO",
@@ -167,7 +171,7 @@ export const PRICING_PLANS_STANDARD: PricingPlan[] = [
       "SMS inbox",
       "Lead sync when configured",
     ],
-    cta: "Get started",
+    cta: "Request beta access",
     href: "/signup",
     primary: false,
   },
@@ -184,7 +188,7 @@ export const PRICING_PLANS_STANDARD: PricingPlan[] = [
       "Analytics dashboard",
       "Priority support",
     ],
-    cta: "Get started",
+    cta: "Request beta access",
     href: "/signup",
     primary: true,
   },

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "LeadHandler.ai — Pricing",
   description:
-    "AI-powered SMS lead qualification and routing for real estate brokerages. Simple pricing, 14-day free trial.",
+    "Simple pricing for real estate brokerages. Beta access, limited spots.",
 };
 
 export default function PricingLayout({

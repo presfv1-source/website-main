@@ -10,50 +10,25 @@ import { FadeUp } from "@/components/marketing/FadeUp";
 import { SectionLabel } from "@/components/marketing/SectionLabel";
 import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
 import { cn } from "@/lib/utils";
+import { PRICING_PLANS_BETA, PRICING_PLANS_STANDARD } from "@/lib/marketingContent";
 
 type BillingInterval = "monthly" | "annual";
 
-const PLANS = [
-  {
-    id: "essentials",
-    name: "Essentials",
-    priceMonthly: 99,
-    priceAnnual: 79,
-    standardPrice: 349,
-    description:
-      "For growing brokerages that need fast lead response and smart routing.",
-    features: [
-      "Up to 15 agents",
-      "AI SMS qualification",
-      "Shared inbox",
-      "Round-robin routing",
-      "Basic dashboard",
-      "Lead status pipeline",
-      "14-day free trial",
-    ],
-    featured: false,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    priceMonthly: 249,
-    priceAnnual: 199,
-    standardPrice: 749,
-    description:
-      "For established brokerages that want full automation and analytics.",
-    features: [
-      "Up to 40+ agents",
-      "Everything in Essentials",
-      "Weighted & performance routing",
-      "Escalation targets",
-      "Analytics dashboard",
-      "Priority support",
-      "Dedicated onboarding",
-    ],
-    featured: true,
-    urgency: "Only 7 beta spots left",
-  },
-];
+/** Single source of truth: beta plans with standard price for strikethrough. */
+const PLANS = PRICING_PLANS_BETA.map((p) => {
+  const standard = PRICING_PLANS_STANDARD.find((s) => s.id === p.id);
+  return {
+    id: p.id,
+    name: p.name,
+    priceMonthly: p.price ?? 0,
+    priceAnnual: p.priceAnnual ?? 0,
+    standardPrice: standard?.price ?? 0,
+    description: p.description,
+    features: p.features,
+    featured: p.primary ?? false,
+    urgency: p.id === "pro" ? "Only 7 beta spots left" : undefined,
+  };
+});
 
 const COMPARISON = [
   { feature: "Agents", essentials: "Up to 15", pro: "Up to 40+" },
@@ -70,8 +45,8 @@ const COMPARISON = [
 
 const FAQ_ITEMS = [
   {
-    q: "How does the free trial work?",
-    a: "14 days, full access, no card needed. You can set up your brokerage, connect lead sources, and try every feature before committing.",
+    q: "How do I get beta access?",
+    a: "Request access via the signup page. We're onboarding a limited number of brokerages during beta.",
   },
   {
     q: "Can I switch plans later?",
@@ -91,7 +66,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Do you offer refunds?",
-    a: "Yes. 14-day money-back guarantee. If it's not a fit, we'll refund you—no questions asked.",
+    a: "We offer refunds on a case-by-case basis for beta customers.",
   },
 ];
 
@@ -143,7 +118,7 @@ export default function PricingPage() {
                   Simple pricing for serious brokerages.
                 </h1>
                 <p className="font-sans text-gray-500 text-lg">
-                  14-day free trial. No credit card required. Cancel anytime.
+                  Beta pricing — locked for early members.
                 </p>
                 <div className="flex justify-center items-center gap-3 mt-8">
                   <div className="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1">
@@ -210,9 +185,11 @@ export default function PricingPage() {
                             (billed annually)
                           </span>
                         )}
-                        <span className="text-sm font-sans text-gray-400 line-through w-full">
-                          normally ${plan.standardPrice}/mo
-                        </span>
+                        {plan.standardPrice > 0 && (
+                          <span className="text-sm font-sans text-gray-400 line-through w-full">
+                            normally ${plan.standardPrice}/mo
+                          </span>
+                        )}
                       </div>
                       <p className="font-sans text-gray-500 text-sm mb-6 leading-relaxed">
                         {plan.description}
@@ -232,7 +209,7 @@ export default function PricingPage() {
                         href="/signup"
                         className="inline-flex items-center justify-center rounded-xl px-6 py-3 font-sans font-semibold bg-[#2563EB] text-white hover:opacity-90 min-h-[48px] w-full"
                       >
-                        Claim Beta Spot
+                        Request beta access
                       </Link>
                     </div>
                   );

@@ -32,7 +32,7 @@ export function CtaBanner() {
               href="/signup"
               className="inline-flex items-center justify-center rounded-xl px-8 py-3 font-sans font-semibold bg-white text-blue-600 hover:bg-white/90 min-h-[48px]"
             >
-              Start free trial
+              Request beta access
             </Link>
             <Link
               href="/contact"

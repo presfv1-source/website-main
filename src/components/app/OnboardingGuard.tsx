@@ -1,6 +1,9 @@
+// FIXED: Shows children immediately while checking (no blank screen).
+// Only redirects if onboarding is genuinely incomplete.
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 interface OnboardingGuardProps {
@@ -12,11 +15,9 @@ interface OnboardingGuardProps {
 export function OnboardingGuard({ isOwner, children }: OnboardingGuardProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (!isOwner || pathname === "/app/onboarding") {
-      queueMicrotask(() => setChecked(true));
       return;
     }
     fetch("/api/onboarding", { credentials: "include" })
@@ -26,12 +27,10 @@ export function OnboardingGuard({ isOwner, children }: OnboardingGuardProps) {
           router.replace("/app/onboarding");
         }
       })
-      .catch(() => {})
-      .finally(() => queueMicrotask(() => setChecked(true)));
+      .catch(() => {});
   }, [isOwner, pathname, router]);
 
-  if (!checked && isOwner && pathname !== "/app/onboarding") {
-    return null;
-  }
+  // Always render children immediately — no blank screen.
+  // If onboarding is needed, the redirect will kick in from the effect.
   return <>{children}</>;
 }

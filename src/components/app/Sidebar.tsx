@@ -56,98 +56,88 @@ export function Sidebar({ role: roleProp, className }: SidebarProps) {
     .toUpperCase()
     .slice(0, 2) || "U";
 
-  const navContent = (
-    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4" aria-label="App navigation">
-      {nav.map((item) => {
-        const Icon = item.icon;
-        const isActive =
-          pathname === item.href || pathname.startsWith(item.href + "/");
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 mx-2 px-3 py-3 rounded-xl transition-colors duration-150 border-l-2",
-              isActive
-                ? "bg-blue-600/10 text-white border-blue-500 pl-2.5"
-                : "border-transparent text-slate-400 hover:bg-slate-800 hover:text-white"
-            )}
-          >
-            <Icon className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm font-medium font-sans whitespace-nowrap overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
-
-  const bottomSection = (
-    <div className="border-t border-slate-800 p-2 mt-auto shrink-0">
-      <Link
-        href="/app/account"
-        className={cn(
-          "flex items-center gap-3 mx-2 px-3 py-3 rounded-xl transition-colors duration-150 border-l-2",
-          pathname === "/app/account" || pathname.startsWith("/app/account/")
-            ? "bg-blue-600/10 text-white border-blue-500 pl-2.5"
-            : "border-transparent text-slate-400 hover:bg-slate-800 hover:text-white"
-        )}
-      >
-        <UserCircle className="w-5 h-5 flex-shrink-0" />
-        <span className="text-sm font-medium font-sans whitespace-nowrap overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
-          Account
-        </span>
-      </Link>
-      <div className="flex items-center gap-3 px-3 py-3 mx-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
-        <div className="h-8 w-8 rounded-full bg-slate-600 flex items-center justify-center text-xs font-medium text-white flex-shrink-0">
-          {initials}
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-slate-300 truncate">{firstName}</p>
-          <p className="text-xs text-slate-500 font-sans">
-            {isOwnerRole ? "Owner" : "Agent"}
-          </p>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={() => signOut({ redirectUrl: "/login" })}
-        className="flex items-center gap-3 w-full mx-2 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white text-sm font-sans transition-colors opacity-0 group-hover:opacity-100"
-      >
-        <LogOut className="w-4 h-4 flex-shrink-0" />
-        <span>Sign out</span>
-      </button>
-    </div>
-  );
-
   return (
     <aside
       className={cn(
-        "group hidden md:flex flex-col fixed left-0 top-0 z-40 h-full w-16 hover:w-56 transition-all duration-200 ease-in-out bg-slate-900",
+        "group fixed left-0 top-0 z-40 hidden h-full w-16 flex-col border-r border-sidebar-border/70 bg-sidebar/95 backdrop-blur-xl transition-all duration-200 ease-in-out hover:w-56 md:flex",
         className
       )}
     >
-      <div className="p-4 border-b border-slate-800 shrink-0">
+      <div className="shrink-0 border-b border-sidebar-border/60 p-4">
         <Link
           href={isOwnerRole ? "/app/dashboard" : "/app/leads"}
-          className="flex items-center gap-3 rounded-xl px-2 py-2 min-h-[44px] text-slate-300 hover:text-white transition-colors"
+          className="flex min-h-[44px] items-center gap-3 rounded-xl px-2 py-2 text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
         >
-          <span className="font-display font-bold text-lg text-white flex-shrink-0 w-8 text-center">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary/20 text-sm font-bold text-sidebar-primary-foreground ring-1 ring-sidebar-primary/40">
             LH
           </span>
-          <span className="text-sm font-display font-semibold whitespace-nowrap overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
+          <span className="overflow-hidden whitespace-nowrap text-sm font-display font-semibold opacity-0 transition-opacity duration-150 delay-75 group-hover:opacity-100">
             LeadHandler
           </span>
         </Link>
       </div>
-      {navContent}
-      {bottomSection}
+
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4" aria-label="App navigation">
+        {nav.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "mx-2 flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 transition-all duration-150",
+                isActive
+                  ? "border-violet-300/30 bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-violet-950/20"
+                  : "text-sidebar-foreground/75 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              <span className="overflow-hidden whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-150 delay-75 group-hover:opacity-100">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="mt-auto shrink-0 border-t border-sidebar-border/60 p-2">
+        <Link
+          href="/app/account"
+          className={cn(
+            "mx-2 flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 transition-all",
+            pathname === "/app/account" || pathname.startsWith("/app/account/")
+              ? "border-violet-300/30 bg-sidebar-primary text-sidebar-primary-foreground"
+              : "text-sidebar-foreground/75 hover:border-sidebar-border hover:bg-sidebar-accent hover:text-sidebar-foreground"
+          )}
+        >
+          <UserCircle className="h-5 w-5 shrink-0" />
+          <span className="overflow-hidden whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-150 delay-75 group-hover:opacity-100">
+            Account
+          </span>
+        </Link>
+        <div className="mx-2 flex items-center gap-3 px-3 py-3 opacity-0 transition-opacity duration-150 delay-75 group-hover:opacity-100">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-foreground">
+            {initials}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-sidebar-foreground">{firstName}</p>
+            <p className="text-xs text-sidebar-foreground/65">{isOwnerRole ? "Owner" : "Agent"}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => signOut({ redirectUrl: "/login" })}
+          className="mx-2 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          <span className="opacity-0 transition-opacity duration-150 delay-75 group-hover:opacity-100">Sign out</span>
+        </button>
+      </div>
     </aside>
   );
 }
 
-/** Same nav content for mobile drawer (used by Topbar). */
 export function SidebarNavContent({
   role,
   onLinkClick,
@@ -162,22 +152,21 @@ export function SidebarNavContent({
     <nav className="flex flex-col gap-1 py-4" aria-label="App navigation">
       {nav.map((item) => {
         const Icon = item.icon;
-        const isActive =
-          pathname === item.href || pathname.startsWith(item.href + "/");
+        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
             key={item.href}
             href={item.href}
             onClick={onLinkClick}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-4 py-3 mx-2 transition-colors",
+              "mx-2 flex min-h-[44px] items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
               isActive
-                ? "bg-blue-600/10 text-white border-l-2 border-blue-500"
-                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             )}
           >
-            <Icon className="h-5 w-5 flex-shrink-0" />
-            <span className="text-sm font-medium font-sans">{item.label}</span>
+            <Icon className="h-5 w-5 shrink-0" />
+            <span>{item.label}</span>
           </Link>
         );
       })}
@@ -185,14 +174,14 @@ export function SidebarNavContent({
         href="/app/account"
         onClick={onLinkClick}
         className={cn(
-          "flex items-center gap-3 rounded-xl px-4 py-3 mx-2 mt-4 border-t border-slate-800 pt-4 transition-colors",
+          "mx-2 mt-4 flex min-h-[44px] items-center gap-3 border-t border-sidebar-border px-4 pt-4 text-sm font-medium transition-colors",
           pathname === "/app/account"
-            ? "bg-blue-600/10 text-white border-l-2 border-blue-500"
-            : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            ? "text-sidebar-primary-foreground"
+            : "text-sidebar-foreground/80 hover:text-sidebar-foreground"
         )}
       >
-        <UserCircle className="h-5 w-5 flex-shrink-0" />
-        <span className="text-sm font-medium font-sans">Account</span>
+        <UserCircle className="h-5 w-5 shrink-0" />
+        <span>Account</span>
       </Link>
     </nav>
   );

@@ -16,7 +16,7 @@ export const metadata = {
 
 export default function MarketingHomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <Navbar />
       <main>
         <FadeUp>

@@ -15,7 +15,7 @@ const navLinks = [
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <header className="sticky top-0 z-50 border-b border-white/40 bg-white/70 backdrop-blur-xl">
       <div
         className={cn(
           CONTAINER,
@@ -25,9 +25,9 @@ export function Navbar() {
       >
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-1.5 text-xl font-display font-bold text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+          className="flex shrink-0 items-center gap-1.5 text-xl font-display font-bold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
         >
-          <Zap className="h-5 w-5 text-blue-600" aria-hidden />
+          <Zap className="h-5 w-5 text-violet-600" aria-hidden />
           LeadHandler.ai
         </Link>
 
@@ -39,7 +39,7 @@ export function Navbar() {
             <Link
               key={href}
               href={href}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+              className="text-sm font-medium text-gray-600 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
             >
               {label}
             </Link>
@@ -49,13 +49,13 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <Link
             href="/login"
-            className="inline-flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md py-2"
+            className="inline-flex items-center justify-center text-sm font-medium text-gray-600 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md py-2"
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition-colors min-h-[40px]"
+            className="inline-flex items-center justify-center min-h-[40px] rounded-full bg-gradient-to-r from-violet-600 to-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition-all hover:from-violet-500 hover:to-sky-400"
           >
             Request beta access
           </Link>
@@ -82,21 +82,21 @@ export function Navbar() {
                   <Link
                     key={href}
                     href={href}
-                    className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-slate-900"
                   >
                     {label}
                   </Link>
                 ))}
                 <Link
                   href="/login"
-                  className="mt-2 rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="mt-2 flex min-h-[44px] items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-violet-50"
                 >
                   Log in
                 </Link>
               </nav>
               <Link
                 href="/signup"
-                className="w-full inline-flex items-center justify-center min-h-[44px] rounded-full bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 mt-4"
+                className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-sky-500 px-4 py-3 text-sm font-semibold text-white"
               >
                 Request beta access
               </Link>

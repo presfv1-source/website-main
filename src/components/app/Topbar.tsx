@@ -102,7 +102,7 @@ export function Topbar({
     <>
       <header
         className={cn(
-          "sticky top-0 z-30 flex h-[60px] items-center gap-4 border-b border-slate-200 bg-white px-4 shrink-0",
+          "sticky top-0 z-30 flex h-[64px] shrink-0 items-center gap-4 border-b border-white/40 bg-white/70 px-4 backdrop-blur-xl",
           className
         )}
       >
@@ -112,7 +112,7 @@ export function Topbar({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 min-h-[44px] min-w-[44px] text-slate-600"
+                className="h-10 w-10 min-h-[44px] min-w-[44px] text-muted-foreground"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
@@ -120,10 +120,10 @@ export function Topbar({
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-72 max-w-[calc(100vw-2rem)] bg-slate-900 border-slate-800 p-0"
+              className="w-72 max-w-[calc(100vw-2rem)] border-sidebar-border bg-sidebar p-0"
             >
-              <div className="p-4 border-b border-slate-800">
-                <span className="font-display font-semibold text-white">
+              <div className="border-b border-sidebar-border p-4">
+                <span className="font-display font-semibold text-sidebar-foreground">
                   LeadHandler
                 </span>
               </div>
@@ -133,7 +133,7 @@ export function Topbar({
               />
             </SheetContent>
           </Sheet>
-          <h1 className="font-display font-semibold text-lg text-slate-900 truncate">
+          <h1 className="truncate bg-gradient-to-r from-violet-700 to-sky-500 bg-clip-text text-lg font-display font-semibold text-transparent">
             {pageTitle}
           </h1>
         </div>
@@ -152,7 +152,7 @@ export function Topbar({
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 text-slate-600 hover:text-slate-900"
+            className="h-10 w-10 text-muted-foreground hover:text-foreground"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -164,7 +164,7 @@ export function Topbar({
                 className="relative h-10 w-10 rounded-full min-h-[44px] min-w-[44px] md:h-9 md:w-9 md:min-h-0 md:min-w-0"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-slate-200 text-slate-700 font-sans">
+                  <AvatarFallback className="bg-violet-100 text-violet-700 font-sans">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -173,8 +173,8 @@ export function Topbar({
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col font-sans">
-                  <span className="text-slate-900">{displayName}</span>
-                  <span className="text-xs font-normal text-slate-500">
+                  <span className="text-foreground">{displayName}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
                     Viewing as {roleLabel}
                     {demoEnabled && " (Demo)"}
                   </span>
@@ -183,7 +183,7 @@ export function Topbar({
               {realRole === "owner" && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="text-xs font-normal text-slate-500">
+                  <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                     View as
                   </DropdownMenuLabel>
                   {ROLES.map((r) => (
@@ -210,7 +210,7 @@ export function Topbar({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
-                className="max-md:min-h-[44px] text-red-600"
+                className="max-md:min-h-[44px] text-rose-600"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out

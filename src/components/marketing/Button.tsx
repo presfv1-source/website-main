@@ -21,21 +21,17 @@ export function Button({
   onClick?: () => void;
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-full px-8 py-3.5 font-semibold font-sans text-base transition-all min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
+    "inline-flex min-h-[44px] items-center justify-center rounded-full px-8 py-3.5 font-sans text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-60";
   const styles = {
     primary:
-      "bg-blue-600 text-white hover:bg-blue-500",
+      "bg-gradient-to-r from-violet-600 to-sky-500 text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-sky-400",
     ghost:
-      "border border-slate-600 text-slate-300 hover:border-slate-400 bg-transparent",
+      "border border-white/30 bg-white/5 text-slate-100 backdrop-blur hover:border-white/60 hover:bg-white/10",
   };
   const combined = cn(base, styles[variant], className);
 
   if (href) {
-    return (
-      <Link href={href} className={combined}>
-        {children}
-      </Link>
-    );
+    return <Link href={href} className={combined}>{children}</Link>;
   }
   return (
     <button

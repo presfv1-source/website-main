@@ -18,17 +18,19 @@ export function AppShell({ children, session, demoEnabled, hasBackendConnected =
   const effectiveRole = session?.effectiveRole ?? session?.role ?? "agent";
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-transparent">
       <Sidebar role={effectiveRole} />
-      <div className="flex flex-1 flex-col min-w-0 md:ml-16">
+      <div className="flex min-w-0 flex-1 flex-col md:ml-16">
         <Topbar
           session={session ? { name: session.name, role: session.role, effectiveRole } : null}
           demoEnabled={demoEnabled}
           isOwner={isOwner}
         />
         <DemoModeBanner demoEnabled={demoEnabled} isOwner={isOwner} hasBackendConnected={hasBackendConnected} />
-        <main className="flex-1 p-6 lg:p-8 min-w-0 overflow-auto">
-          <OnboardingGuard isOwner={isOwner}>{children}</OnboardingGuard>
+        <main className="min-w-0 flex-1 overflow-auto p-5 lg:p-8">
+          <div className="rounded-3xl border border-white/40 bg-white/55 p-4 shadow-xl shadow-violet-100/60 backdrop-blur-lg sm:p-6">
+            <OnboardingGuard isOwner={isOwner}>{children}</OnboardingGuard>
+          </div>
         </main>
       </div>
     </div>

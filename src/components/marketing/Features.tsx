@@ -54,11 +54,11 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section id="features" className="py-16 md:py-24 bg-white">
+    <section id="features" className="bg-transparent py-16 md:py-24">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <div className="text-center mb-12">
           <SectionLabel className="mb-3">Features</SectionLabel>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A] text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center max-w-2xl mx-auto">
             Everything your brokerage needs to stop losing leads.
           </h2>
         </div>
@@ -69,17 +69,17 @@ export function Features() {
               <div
                 key={f.title}
                 className={cn(
-                  "bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all cursor-default",
-                  f.highlight && "ring-1 ring-blue-200 bg-blue-50/30"
+                  "rounded-2xl border border-white/60 bg-white/70 p-6 shadow-md shadow-violet-100/50 backdrop-blur transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-200/50 cursor-default",
+                  f.highlight && "ring-1 ring-violet-300/40 bg-violet-50/60"
                 )}
               >
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#2563EB] mb-4 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-violet-100/70 flex items-center justify-center text-violet-600 mb-4 shrink-0">
                   <Icon className="h-5 w-5" aria-hidden />
                 </div>
-                <h3 className="font-semibold text-[#0F172A] text-base">
+                <h3 className="font-semibold text-slate-900 text-base">
                   {f.title}
                 </h3>
-                <p className="font-sans text-[#64748B] text-sm leading-relaxed mt-1">
+                <p className="font-sans text-slate-600 text-sm leading-relaxed mt-1">
                   {f.description}
                 </p>
               </div>

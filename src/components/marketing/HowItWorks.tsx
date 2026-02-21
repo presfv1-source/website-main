@@ -1,61 +1,60 @@
 "use client";
 
-import { MessageCircle, Zap, Route } from "lucide-react";
-import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
-import { cn } from "@/lib/utils";
-import { SectionLabel } from "./SectionLabel";
-
 const STEPS = [
   {
-    icon: MessageCircle,
+    num: "01 —",
     title: "Lead texts your listing number",
-    body: "Someone sees your sign or ad and texts. That's the trigger.",
+    body: "Someone sees your yard sign or listing ad and sends a text. That's the trigger — no app, no form, just a simple text message.",
   },
   {
-    icon: Zap,
+    num: "02 —",
     title: "Instant auto-reply collects the details",
-    body: "LeadHandler texts back immediately — name, buying or selling, timeline, budget. No agent needed.",
+    body: "LeadHandler responds in seconds — collecting name, intent, timeline, and budget. No agent needs to be available.",
   },
   {
-    icon: Route,
+    num: "03 —",
     title: "Routed to the right agent, tracked in one inbox",
-    body: "The conversation goes to the right agent based on your rules. Every thread is logged. Nothing falls through.",
+    body: "The conversation routes to the right agent based on your rules. Every thread is logged and visible. Nothing falls through the cracks.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-16 md:py-24 bg-[#F8FAFC]">
-      <div className={cn(CONTAINER, PAGE_PADDING)}>
-        <div className="text-center mb-14">
-          <SectionLabel className="mb-3">How it works</SectionLabel>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A] text-center max-w-2xl mx-auto">
-            From &apos;text for info&apos; to routed conversation — in under a minute.
+    <section id="how-it-works" className="py-24 px-4 sm:px-8 bg-[var(--off)]">
+      <div className="mx-auto max-w-[1100px]">
+        <div className="text-center mb-12">
+          <div className="mb-3.5 inline-block text-[11px] font-bold uppercase tracking-widest text-[var(--subtle)]">
+            How it works
+          </div>
+          <h2
+            className="text-[clamp(28px,3.5vw,42px)] font-black leading-[1.08] text-[var(--ink)] mb-3.5"
+            style={{ letterSpacing: "-1.2px" }}
+          >
+            Lead texts. Handler replies.
+            <br />
+            Agent gets the deal.
           </h2>
+          <p className="text-[15px] text-[var(--muted)] max-w-[420px] mx-auto leading-[1.65]">
+            No downloads. No manual forwarding. One number, your rules, done in minutes.
+          </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {STEPS.map((step, i) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={step.title}
-                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow text-left"
-              >
-                <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white text-sm font-bold flex items-center justify-center shrink-0">
-                  {i + 1}
-                </div>
-                <div className="mt-3 flex items-center justify-center w-10 h-10 text-[#2563EB]">
-                  <Icon className="h-8 w-8" aria-hidden />
-                </div>
-                <h3 className="font-semibold text-[#0F172A] text-lg mt-3">
-                  {step.title}
-                </h3>
-                <p className="font-sans text-[#64748B] text-sm leading-relaxed mt-1">
-                  {step.body}
-                </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px rounded-[20px] overflow-hidden border border-[var(--border)] bg-[var(--border)]">
+          {STEPS.map((step) => (
+            <div
+              key={step.num}
+              className="bg-[var(--white)] p-8 sm:p-9"
+            >
+              <div className="text-[11px] font-extrabold text-[var(--off2)] tracking-wider tabular-nums mb-5">
+                {step.num}
               </div>
-            );
-          })}
+              <div className="text-[15.5px] font-extrabold text-[var(--ink)] mb-2.5 tracking-[-0.3px]">
+                {step.title}
+              </div>
+              <div className="text-[13.5px] text-[var(--muted)] leading-[1.65]">
+                {step.body}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

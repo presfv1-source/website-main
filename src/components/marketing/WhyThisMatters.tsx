@@ -12,7 +12,7 @@ const BULLETS = [
 
 export function WhyThisMatters() {
   return (
-    <section className="py-16 md:py-24 bg-[#0A0F1E] text-white">
+    <section className="py-16 sm:py-20 lg:py-24 bg-[#0A0F1E] text-white">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
           Most teams lose leads in the first 60 seconds.

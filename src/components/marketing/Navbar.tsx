@@ -1,109 +1,106 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Zap } from "lucide-react";
-import { CONTAINER, PAGE_PADDING } from "@/lib/ui";
-import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/#features", label: "Features" },
-  { href: "/#pricing", label: "Pricing" },
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#features", label: "Features" },
+  { href: "/pricing", label: "Pricing" },
 ] as const;
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div
-        className={cn(
-          CONTAINER,
-          PAGE_PADDING,
-          "flex h-[68px] items-center justify-between gap-4"
-        )}
-      >
+    <nav
+      className="sticky top-0 z-[100] border-b border-[var(--border)] bg-white/95 backdrop-blur-[18px]"
+      aria-label="Main"
+    >
+      <div className="mx-auto flex h-[60px] max-w-[1100px] items-center justify-between px-4 sm:px-8">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-1.5 text-xl font-display font-bold text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+          className="flex items-center gap-2 text-[15px] font-bold tracking-[-0.35px] text-[var(--ink)] no-underline"
         >
-          <Zap className="h-5 w-5 text-blue-600" aria-hidden />
+          <div
+            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--ink)]"
+            aria-hidden
+          >
+            <svg
+              viewBox="0 0 14 14"
+              fill="none"
+              stroke="white"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3.5 w-3.5"
+            >
+              <path d="M2 7h9M7.5 3L11 7l-3.5 4" />
+            </svg>
+          </div>
           LeadHandler.ai
         </Link>
 
-        <nav
-          className="hidden md:flex flex-wrap items-center justify-center gap-8"
-          aria-label="Main"
-        >
+        <ul className="hidden md:flex list-none gap-1.5">
           {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
-            >
-              {label}
-            </Link>
+            <li key={href}>
+              <Link
+                href={href}
+                className="rounded-lg px-3 py-1.5 text-[13.5px] font-medium text-[var(--muted)] no-underline transition-all duration-[0.14s] hover:bg-[var(--off)] hover:text-[var(--ink)]"
+              >
+                {label}
+              </Link>
+            </li>
           ))}
-        </nav>
+        </ul>
 
-        <div className="hidden md:flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="inline-flex items-center justify-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md py-2"
+            className="hidden rounded-lg px-3 py-1.5 text-[13.5px] font-medium text-[var(--muted)] no-underline transition-all duration-[0.14s] hover:bg-[var(--off)] hover:text-[var(--ink)] sm:inline-block"
           >
             Log in
           </Link>
           <Link
-            href="/signup"
-            className="inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition-colors min-h-[40px]"
+            href="#form"
+            className="inline-flex items-center rounded-lg bg-[var(--ink)] px-4 py-2 text-[13.5px] font-semibold text-white no-underline tracking-[-0.1px] transition-opacity duration-[0.14s] hover:opacity-80"
           >
-            Request beta access
+            Request access
           </Link>
-        </div>
-
-        <div className="flex md:hidden items-center gap-2">
           <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="min-h-[44px] min-w-[44px]"
-                aria-label="Open menu"
-              >
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-72 max-w-[calc(100vw-2rem)] pt-12 flex flex-col"
-            >
-              <nav className="flex flex-col gap-1 flex-1" aria-label="Main">
+            <SheetContent side="right" className="w-72 max-w-[calc(100vw-2rem)] pt-12">
+              <nav className="flex flex-col gap-1" aria-label="Main">
                 {navLinks.map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
-                    className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-[var(--muted)] hover:bg-[var(--off)] hover:text-[var(--ink)]"
                   >
                     {label}
                   </Link>
                 ))}
                 <Link
                   href="/login"
-                  className="mt-2 rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="rounded-lg px-4 py-3 text-sm font-medium text-[var(--muted)] hover:bg-[var(--off)]"
                 >
                   Log in
                 </Link>
+                <Link
+                  href="#form"
+                  className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--ink)] px-4 py-3 text-sm font-semibold text-white no-underline"
+                >
+                  Request access
+                </Link>
               </nav>
-              <Link
-                href="/signup"
-                className="w-full inline-flex items-center justify-center min-h-[44px] rounded-full bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 mt-4"
-              >
-                Request beta access
-              </Link>
             </SheetContent>
           </Sheet>
         </div>
       </div>
-    </header>
+    </nav>
   );
 }

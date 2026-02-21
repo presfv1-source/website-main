@@ -1,0 +1,19 @@
+/* Marketing homepage color system — no accent colors. */
+.marketing {
+  --white: #ffffff;
+  --off: #f5f5f5;
+  --off2: #efefef;
+  --border: #e2e2e2;
+  --border2: #d4d4d4;
+  --ink: #111111;
+  --ink2: #222222;
+  --muted: #6a6a6a;
+  --subtle: #a0a0a0;
+}
+
+.marketing {
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}

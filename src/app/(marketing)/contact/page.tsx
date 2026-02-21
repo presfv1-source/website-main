@@ -56,7 +56,7 @@ export default function ContactPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main>
-        <section className="py-12 md:py-16 bg-gray-950">
+        <section className="py-12 md:py-16 bg-[#0A0F1E]">
           <div className={cn(CONTAINER, PAGE_PADDING)}>
             <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
               Let&apos;s talk about your brokerage.
@@ -247,7 +247,7 @@ export default function ContactPage() {
         </FadeUp>
 
         <FadeUp>
-          <section className="py-12 md:py-16 bg-gray-50 border-t border-gray-200">
+          <section className="py-12 md:py-16 bg-[#F8FAFC] border-t border-gray-200">
             <div className={cn(CONTAINER, PAGE_PADDING)}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
                 <div>

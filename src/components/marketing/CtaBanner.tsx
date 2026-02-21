@@ -6,25 +6,13 @@ import { cn } from "@/lib/utils";
 
 export function CtaBanner() {
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
-      <div
-        className="absolute inset-0 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500"
-        aria-hidden
-      />
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-          backgroundSize: "24px 24px",
-        }}
-        aria-hidden
-      />
-      <div className={cn("relative", CONTAINER, PAGE_PADDING)}>
+    <section className="relative py-16 md:py-24 overflow-hidden bg-[#0A0F1E]">
+      <div className={cn(CONTAINER, PAGE_PADDING)}>
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-white mb-4 tracking-tight">
             Ready to respond first?
           </h2>
-          <p className="font-sans text-white/90 text-lg mb-8">
+          <p className="font-sans text-white text-lg mb-8">
             Join brokerages across Texas who never miss a lead.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

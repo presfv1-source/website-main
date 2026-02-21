@@ -52,7 +52,12 @@
 }
 
 /* Theme: primary is blue accent. Use hover:bg-primary/90 for buttons. */
+/* Marketing: single color system for all marketing pages. */
 :root {
+  --bg-dark: #0A0F1E;
+  --bg-mid: #F8FAFC;
+  --bg-white: #FFFFFF;
+  --accent: #2563EB;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

@@ -9,7 +9,7 @@ export default function TermsPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <MarketingHeader />
 
-      <section className="py-12 md:py-16 bg-gray-950">
+      <section className="py-12 md:py-16 bg-[#0A0F1E]">
         <div className={cn(CONTAINER_NARROW, PAGE_PADDING)}>
           <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
             Terms of service
@@ -17,7 +17,7 @@ export default function TermsPage() {
         </div>
       </section>
 
-      <main className={cn(CONTAINER_NARROW, PAGE_PADDING, "flex-1 py-12 md:py-16")}>
+      <main className={cn(CONTAINER_NARROW, PAGE_PADDING, "flex-1 py-12 md:py-16 bg-white")}>
         <p className="text-gray-600 leading-relaxed mt-2">
           Terms governing your use of LeadHandler.ai.
         </p>

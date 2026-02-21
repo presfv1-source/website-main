@@ -109,7 +109,7 @@ export default function PricingPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main>
-        <section className="py-12 md:py-16 bg-gray-950">
+        <section className="py-12 md:py-16 bg-[#0A0F1E]">
           <div className={cn(CONTAINER, PAGE_PADDING)}>
             <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
               Simple beta pricing.
@@ -224,7 +224,7 @@ export default function PricingPage() {
         </FadeUp>
 
         <FadeUp>
-          <section className="py-16 md:py-24 bg-gray-50 border-t border-gray-200">
+          <section className="py-16 md:py-24 bg-[#F8FAFC] border-t border-gray-200">
             <div className={cn(CONTAINER, PAGE_PADDING)}>
               <h2 className="font-display font-bold text-[#0A0A0A] text-2xl mb-8 text-center">
                 Feature comparison
@@ -272,7 +272,7 @@ export default function PricingPage() {
         </FadeUp>
 
         <FadeUp>
-          <section className="py-16 md:py-24 bg-gray-50">
+          <section className="py-16 md:py-24 bg-[#F8FAFC]">
             <div className={cn(CONTAINER, PAGE_PADDING)}>
               <h2 className="font-display font-bold text-[#0A0A0A] text-2xl mb-8 text-center">
                 Common questions

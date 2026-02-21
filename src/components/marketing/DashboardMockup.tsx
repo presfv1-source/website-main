@@ -1,114 +1,161 @@
 "use client";
 
-const STATS = [
-  { label: "New Leads", value: "24", sub: "+12%" },
-  { label: "Avg Reply", value: "2.5m", sub: null },
-  { label: "Active Convos", value: "8", sub: null },
-  { label: "Reply rate", value: "68%", sub: null },
+import { cn } from "@/lib/utils";
+
+const INBOX_ROWS = [
+  {
+    initials: "JR",
+    avatarClass: "bg-blue-100 text-blue-700",
+    name: "James R.",
+    source: "Listing #4821",
+    preview: "Hi! I saw the sign on Oak Ln, is it still—",
+    time: "0:42 ago",
+    unread: true,
+    agent: "→ Sarah M.",
+    agentOrange: false,
+    active: true,
+  },
+  {
+    initials: "DK",
+    avatarClass: "bg-green-100 text-green-700",
+    name: "Diana K.",
+    source: "Team number",
+    preview: "How much are they asking?",
+    time: "3m ago",
+    unread: false,
+    agent: "→ Marcus W.",
+    agentOrange: false,
+    active: false,
+  },
+  {
+    initials: "RT",
+    avatarClass: "bg-purple-100 text-purple-700",
+    name: "Ray T.",
+    source: "Listing #3302",
+    preview: "Replied: name + looking to buy this s...",
+    time: "11m ago",
+    unread: false,
+    agent: "→ Unassigned",
+    agentOrange: true,
+    active: false,
+  },
 ];
 
-const LEADS = [
-  { name: "James R.", source: "Listing", status: "Hot" as const },
-  { name: "Maria S.", source: "Direct", status: "Warm" as const },
-  { name: "David K.", source: "Referral", status: "New" as const },
+const STAT_CARDS = [
+  { label: "Leads today", value: "9", sub: "+3 vs yesterday", subGreen: true },
+  { label: "Avg first reply", value: "0:38s", sub: "↓ from 2.1m", subGreen: true },
+  { label: "Routed", value: "8 / 9", sub: "1 pending", subGreen: false },
+  { label: "No response", value: "0", sub: "All covered", subGreen: true },
 ];
-
-const NAV_ITEMS = [
-  { label: "Dashboard", active: true },
-  { label: "Leads", active: false },
-  { label: "Inbox", active: false },
-  { label: "Routing", active: false },
-  { label: "Agents", active: false },
-  { label: "Analytics", active: false },
-];
-
-function StatusBadge({ status }: { status: "Hot" | "Warm" | "New" }) {
-  const styles = {
-    Hot: "bg-red-50 text-red-600",
-    Warm: "bg-orange-50 text-orange-600",
-    New: "bg-green-50 text-green-600",
-  };
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
-      {status}
-    </span>
-  );
-}
 
 export function DashboardMockup() {
   return (
-    <div className="rounded-2xl border border-gray-200 shadow-2xl overflow-hidden max-w-4xl mx-auto bg-white">
-      {/* Browser chrome */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 bg-gray-100">
-        <div className="flex gap-1.5">
-          <span className="h-3 w-3 rounded-full bg-red-400" aria-hidden />
-          <span className="h-3 w-3 rounded-full bg-amber-400" aria-hidden />
-          <span className="h-3 w-3 rounded-full bg-emerald-400" aria-hidden />
-        </div>
-        <span className="text-xs font-sans text-gray-500 ml-3 flex-1 text-center max-w-md mx-auto truncate">
+    <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+      {/* Window chrome */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200 bg-gray-100">
+        <span className="w-3 h-3 rounded-full bg-red-400" aria-hidden />
+        <span className="w-3 h-3 rounded-full bg-yellow-400" aria-hidden />
+        <span className="w-3 h-3 rounded-full bg-green-400" aria-hidden />
+        <span className="text-gray-400 text-xs mx-auto font-sans">
           app.leadhandler.ai/dashboard
         </span>
       </div>
       <div className="flex min-h-[320px] sm:min-h-[360px]">
-        {/* Sidebar */}
-        <aside className="hidden sm:flex w-[200px] flex-col border-r border-gray-200 bg-gray-50/80 py-4 px-3 gap-1">
-          <div className="font-display font-bold text-lg text-[#0A0A0A] mb-4 px-2">
-            LeadHandler<span className="text-blue-600">.ai</span>
+        {/* Left panel — Inbox */}
+        <div className="w-56 border-r border-gray-100 bg-white shrink-0">
+          <div className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500" aria-hidden />
+            Inbox
+            <span className="text-[10px] font-medium normal-case text-green-600 bg-green-50 rounded px-1.5 py-0.5">
+              Live
+            </span>
           </div>
-          {NAV_ITEMS.map((item) => (
-            <div
-              key={item.label}
-              className={`rounded-lg px-3 py-2.5 text-sm font-medium font-sans ${
-                item.active
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              {item.label}
-            </div>
-          ))}
-        </aside>
-        {/* Main */}
-        <div className="flex-1 p-4 sm:p-6 min-w-0">
-          <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 font-sans">
-            Today&apos;s Overview
-          </p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-            {STATS.map((s) => (
+          <div className="divide-y-0">
+            {INBOX_ROWS.map((row) => (
               <div
-                key={s.label}
-                className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm"
+                key={row.name}
+                className={cn(
+                  "px-4 py-3 border-b border-gray-50 hover:bg-gray-50",
+                  row.active && "border-l-2 border-l-blue-600 bg-blue-50/30",
+                  !row.active && row.agentOrange && "opacity-90"
+                )}
               >
-                <p className="text-xs font-sans text-gray-500 truncate">{s.label}</p>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-lg font-display font-semibold text-[#0A0A0A]">
-                    {s.value}
-                  </p>
-                  {s.sub && (
-                    <span className="text-xs font-sans text-emerald-600">{s.sub}</span>
-                  )}
+                <div className="flex items-start gap-2">
+                  <div
+                    className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                      row.avatarClass
+                    )}
+                  >
+                    {row.initials}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-sm font-medium text-gray-900 truncate">
+                        {row.name}
+                      </span>
+                      {row.unread && (
+                        <span
+                          className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-1.5"
+                          aria-hidden
+                        />
+                      )}
+                    </div>
+                    <span className="text-[10px] text-gray-400">{row.source}</span>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">
+                      {row.preview}
+                    </p>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-[10px] text-gray-400">{row.time}</span>
+                    </div>
+                    <span
+                      className={cn(
+                        "text-[10px] font-medium rounded px-1.5 py-0.5 mt-1 inline-block",
+                        row.agentOrange
+                          ? "text-amber-700 bg-amber-50"
+                          : "text-blue-600 bg-blue-50"
+                      )}
+                    >
+                      {row.agent}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-            <div className="border-b border-gray-200 px-4 py-2.5 bg-gray-50/80">
-              <p className="text-xs font-sans font-medium text-gray-600">Recent leads</p>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {LEADS.map((lead) => (
-                <div
-                  key={lead.name}
-                  className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-sans"
+        </div>
+        {/* Right panel — Today's stats */}
+        <div className="flex-1 bg-gray-50/50 p-4 min-w-0 flex flex-col">
+          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-3">
+            Today&apos;s stats
+          </p>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {STAT_CARDS.map((card) => (
+              <div
+                key={card.label}
+                className="bg-white rounded-xl p-3 shadow-sm border border-gray-100"
+              >
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+                  {card.label}
+                </p>
+                <p className="text-xl font-bold text-gray-900">{card.value}</p>
+                <p
+                  className={cn(
+                    "text-[10px] font-medium mt-0.5",
+                    card.subGreen ? "text-green-600" : "text-amber-600"
+                  )}
                 >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-[#0A0A0A] truncate">{lead.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{lead.source}</p>
-                  </div>
-                  <StatusBadge status={lead.status} />
-                </div>
-              ))}
-            </div>
+                  {card.sub}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-green-50 rounded-lg px-3 py-2 text-xs text-green-800 flex items-center gap-2 mt-auto">
+            <span
+              className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"
+              aria-hidden
+            />
+            Round-robin routing active · 3 agents online
           </div>
         </div>
       </div>

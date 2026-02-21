@@ -17,7 +17,7 @@ export function MarketingHeader({ className }: { className?: string }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100",
+        "sticky top-0 z-50 bg-white border-b border-gray-100",
         className
       )}
     >

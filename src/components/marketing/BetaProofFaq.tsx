@@ -51,11 +51,11 @@ const FAQ_ITEMS = [
 
 export function BetaProofFaq() {
   return (
-    <section id="beta" className="py-16 md:py-24 bg-white">
+    <section id="beta" className="py-16 md:py-24 bg-[#F8FAFC]">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <div className="text-center mb-8">
           <SectionLabel className="mb-3">Beta access</SectionLabel>
-          <h2 className="text-3xl font-bold text-center text-gray-900">
+          <h2 className="text-3xl font-bold text-center text-[#0F172A]">
             Beta — limited spots in Texas.
           </h2>
         </div>
@@ -63,10 +63,10 @@ export function BetaProofFaq() {
           {BETA_BULLETS.map(({ icon: Icon, text }) => (
             <div
               key={text}
-              className="bg-blue-600 text-white rounded-2xl p-6"
+              className="bg-white border border-gray-200 rounded-2xl p-6"
             >
-              <Icon className="h-8 w-8 text-white mb-3" aria-hidden />
-              <p className="text-sm font-sans leading-relaxed">{text}</p>
+              <Icon className="h-8 w-8 text-[#2563EB] mb-3" aria-hidden />
+              <p className="text-sm font-sans text-[#64748B] leading-relaxed">{text}</p>
             </div>
           ))}
         </div>
@@ -78,10 +78,10 @@ export function BetaProofFaq() {
                 value={`faq-${i}`}
                 className="border-b border-gray-100"
               >
-                <AccordionTrigger className="text-left font-medium text-gray-900 py-4 hover:no-underline">
+                <AccordionTrigger className="text-left font-medium text-[#0F172A] py-4 hover:no-underline">
                   {item.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-500 text-sm pb-4">
+                <AccordionContent className="text-[#64748B] text-sm pb-4">
                   {item.a}
                 </AccordionContent>
               </AccordionItem>

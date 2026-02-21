@@ -12,7 +12,7 @@ const BULLETS = [
 
 export function WhyThisMatters() {
   return (
-    <section className="py-16 md:py-24 bg-gray-950 text-white">
+    <section className="py-16 md:py-24 bg-[#0A0F1E] text-white">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
           Most teams lose leads in the first 60 seconds.
@@ -23,8 +23,8 @@ export function WhyThisMatters() {
               key={text}
               className="bg-white/5 border border-white/10 rounded-2xl p-6"
             >
-              <Icon className="h-10 w-10 text-blue-400 mb-4" aria-hidden />
-              <p className="text-slate-300 text-sm leading-relaxed">{text}</p>
+              <Icon className="h-10 w-10 text-[#2563EB] mb-4" aria-hidden />
+              <p className="text-[#94A3B8] text-sm leading-relaxed">{text}</p>
             </div>
           ))}
         </div>

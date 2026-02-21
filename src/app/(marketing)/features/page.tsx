@@ -183,7 +183,7 @@ export default function FeaturesPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main>
-        <section className="py-12 md:py-16 bg-gray-950">
+        <section className="py-12 md:py-16 bg-[#0A0F1E]">
           <div className={cn(CONTAINER, PAGE_PADDING)}>
             <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
               Built for brokerages that can&apos;t afford to miss a lead.
@@ -220,7 +220,7 @@ export default function FeaturesPage() {
             <section
               className={cn(
                 "py-16 md:py-24",
-                i % 2 === 0 ? "bg-white" : "bg-slate-50"
+                i % 2 === 0 ? "bg-white" : "bg-[#F8FAFC]"
               )}
             >
               <div className={cn(CONTAINER, PAGE_PADDING)}>

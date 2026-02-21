@@ -25,11 +25,11 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-16 md:py-24 bg-white">
+    <section id="how-it-works" className="py-16 md:py-24 bg-[#F8FAFC]">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <div className="text-center mb-14">
           <SectionLabel className="mb-3">How it works</SectionLabel>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A] text-center max-w-2xl mx-auto">
             From &apos;text for info&apos; to routed conversation — in under a minute.
           </h2>
         </div>
@@ -41,16 +41,16 @@ export function HowItWorks() {
                 key={step.title}
                 className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow text-left"
               >
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-bold flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white text-sm font-bold flex items-center justify-center shrink-0">
                   {i + 1}
                 </div>
-                <div className="mt-3 flex items-center justify-center w-10 h-10 text-blue-600">
+                <div className="mt-3 flex items-center justify-center w-10 h-10 text-[#2563EB]">
                   <Icon className="h-8 w-8" aria-hidden />
                 </div>
-                <h3 className="font-semibold text-gray-900 text-lg mt-3">
+                <h3 className="font-semibold text-[#0F172A] text-lg mt-3">
                   {step.title}
                 </h3>
-                <p className="font-sans text-gray-500 text-sm leading-relaxed mt-1">
+                <p className="font-sans text-[#64748B] text-sm leading-relaxed mt-1">
                   {step.body}
                 </p>
               </div>

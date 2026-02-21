@@ -25,7 +25,7 @@ export function MarketingFooter({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "mt-16 sm:mt-24 bg-gray-950 border-t border-white/10 py-10 sm:py-12",
+        "mt-16 sm:mt-24 bg-[#060B17] border-t border-white/10 py-10 sm:py-12",
         className
       )}
     >

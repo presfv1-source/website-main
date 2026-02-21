@@ -25,7 +25,7 @@ const legalLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-gray-950 border-t border-white/10 py-12 md:py-16">
+    <footer className="bg-[#060B17] border-t border-white/10 py-12 md:py-16">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
           <div className="sm:col-span-2 lg:col-span-1">

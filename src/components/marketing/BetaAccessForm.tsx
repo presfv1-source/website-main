@@ -96,12 +96,12 @@ export function BetaAccessForm() {
   }
 
   return (
-    <section id="beta-form" className="py-16 md:py-24 bg-gray-950">
+    <section id="beta-form" className="py-16 md:py-24 bg-[#0A0F1E]">
       <div className={cn(CONTAINER, PAGE_PADDING)}>
         <h2 className="text-white text-3xl md:text-4xl font-bold text-center">
           Request beta access.
         </h2>
-        <p className="text-slate-400 text-center mt-2">
+        <p className="text-[#94A3B8] text-center mt-2">
           Limited spots. Texas brokerages only (for now).
         </p>
 

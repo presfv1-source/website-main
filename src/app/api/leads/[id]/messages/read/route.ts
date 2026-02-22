@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDemoEnabled, getSessionToken } from "@/lib/auth";
+import { requireAuth } from "@/lib/guards";
 import { markLeadMessagesAsRead } from "@/lib/demo/data";
 
 /** Mark all messages for this lead as read (when conversation is opened). Demo only; non-demo no-op. */
@@ -9,13 +10,9 @@ export async function PATCH(
 ) {
   try {
     const session = await getSessionToken(_request);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in required" } },
-        { status: 401 }
-      );
-    }
-    const demo = await getDemoEnabled(session);
+    const deny = requireAuth(session);
+    if (deny) return deny;
+    const demo = await getDemoEnabled(session!);
     const { id: leadId } = await params;
     if (demo && leadId) {
       markLeadMessagesAsRead(leadId);

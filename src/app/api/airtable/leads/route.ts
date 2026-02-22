@@ -4,6 +4,7 @@ import { hasAirtable } from "@/lib/config";
 import { getDemoLeadsAsAppType } from "@/lib/demoData";
 import { getDemoMessages } from "@/lib/demo/data";
 import { getDemoEnabled, getSessionToken } from "@/lib/auth";
+import { requireAuth } from "@/lib/guards";
 import { AirtableAuthError } from "@/lib/airtable";
 
 const postSchema = z.object({
@@ -18,12 +19,8 @@ const postSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const session = await getSessionToken(request);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in to view leads" } },
-        { status: 401 }
-      );
-    }
+    const deny = requireAuth(session);
+    if (deny) return deny;
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") ?? undefined;
     const source = searchParams.get("source") ?? undefined;
@@ -31,8 +28,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") ?? undefined;
     const since = searchParams.get("since") ?? undefined;
 
-    const demo = await getDemoEnabled(session);
-    const requestedAgentId = session?.role === "agent" ? session?.agentId : agentIdParam;
+    const demo = await getDemoEnabled(session!);
+    const requestedAgentId = session!.role === "agent" ? session!.agentId : agentIdParam;
     let leads: Awaited<ReturnType<typeof getDemoLeadsAsAppType>>;
     if (demo) {
       leads = getDemoLeadsAsAppType();
@@ -104,7 +101,9 @@ export async function POST(request: NextRequest) {
   }
   try {
     const session = await getSessionToken(request);
-    const demo = await getDemoEnabled(session);
+    const deny = requireAuth(session);
+    if (deny) return deny;
+    const demo = await getDemoEnabled(session!);
     const body = parsed.data;
     const leadData = {
       name: body.name,

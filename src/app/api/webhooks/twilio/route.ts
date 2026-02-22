@@ -1,24 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hasAirtable, hasMake, hasLlm } from "@/lib/config";
+import { hasAirtable, hasMake } from "@/lib/config";
 import { getLeadByPhone, createMessage, updateLead } from "@/lib/airtable";
-import { messageExistsBySid } from "@/lib/airtable-ext";
 import { triggerWebhook } from "@/lib/make";
-import { handleInboundLeadSms } from "@/lib/qualification";
-import { sendMessage } from "@/lib/twilio";
 
 /** TwiML: empty response so we do not send a duplicate SMS. */
-const TWIML_EMPTY = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response></Response>";
+const TWIML_EMPTY =
+  '<?xml version="1.0" encoding="UTF-8"?><Response></Response>';
 
-const OPT_OUT_KEYWORDS = ["stop", "stopall", "unsubscribe", "cancel", "end", "quit"];
+// ── Idempotency: deduplicate by Twilio MessageSid ──
+const processedSids = new Set<string>();
+const MAX_SID_CACHE = 5000;
 
-function isOptOut(body: string): boolean {
-  const normalized = body.trim().toLowerCase();
-  return OPT_OUT_KEYWORDS.some((k) => normalized === k || normalized.startsWith(k + " "));
+function isNewMessage(sid: string): boolean {
+  if (!sid) return true; // no SID = process anyway
+  if (processedSids.has(sid)) return false;
+  if (processedSids.size >= MAX_SID_CACHE) {
+    const first = processedSids.values().next().value;
+    if (first) processedSids.delete(first);
+  }
+  processedSids.add(sid);
+  return true;
 }
 
-function twimlResponse() {
+/** Normalize message body for keyword detection. */
+function normalizeBody(body: string): string {
+  return body.trim().toUpperCase();
+}
+
+/** STOP keywords per CTIA guidelines. */
+const STOP_KEYWORDS = new Set([
+  "STOP",
+  "STOPALL",
+  "UNSUBSCRIBE",
+  "CANCEL",
+  "END",
+  "QUIT",
+]);
+
+/** UNSTOP / re-subscribe keywords. */
+const UNSTOP_KEYWORDS = new Set(["START", "UNSTOP", "SUBSCRIBE"]);
+
+/** HELP keywords. */
+const HELP_KEYWORDS = new Set(["HELP", "INFO"]);
+
+function xmlResponse(status = 200) {
   return new NextResponse(TWIML_EMPTY, {
-    status: 200,
+    status,
     headers: { "Content-Type": "text/xml; charset=utf-8" },
   });
 }
@@ -33,36 +60,107 @@ export async function POST(request: NextRequest) {
 
     if (!from || !body) {
       console.warn("[Twilio Webhook] Missing From or Body");
-      return twimlResponse();
+      return xmlResponse();
     }
 
-    if (!hasAirtable) {
-      console.warn("[Twilio Webhook] Airtable not configured; skipping persist");
-      return twimlResponse();
+    // ── Idempotency: skip if we already processed this SID ──
+    if (messageSid && !isNewMessage(messageSid)) {
+      console.log(
+        `[Twilio Webhook] Duplicate SID skipped: ${messageSid}`
+      );
+      return xmlResponse();
     }
 
-    if (hasLlm) {
-      await handleInboundLeadSms({ from, to, body, twilioMessageSid: messageSid });
-      return twimlResponse();
-    }
+    const normalized = normalizeBody(body);
 
-    // --- Non-LLM path: idempotency, STOP, do_not_contact gate, then store + Make ---
-    if (messageSid) {
-      const exists = await messageExistsBySid(messageSid);
-      if (exists) {
-        console.info("[Twilio Webhook] Duplicate MessageSid, skipping", { messageSid });
-        return twimlResponse();
+    // ── STOP/HELP handling (runs even without Airtable) ──
+    if (STOP_KEYWORDS.has(normalized)) {
+      console.log(
+        `[Twilio Webhook] STOP received from ${from.slice(-4)}`
+      );
+      if (hasAirtable) {
+        const lead = await getLeadByPhone(from);
+        if (lead) {
+          await updateLead(lead.id, { optedOut: true });
+          await createMessage({
+            leadId: lead.id,
+            body,
+            direction: "in",
+            senderType: "lead",
+            twilioMessageSid: messageSid || undefined,
+          });
+        }
       }
+      // Twilio auto-handles STOP at carrier level; we just track it.
+      return xmlResponse();
+    }
+
+    if (UNSTOP_KEYWORDS.has(normalized)) {
+      console.log(
+        `[Twilio Webhook] UNSTOP received from ${from.slice(-4)}`
+      );
+      if (hasAirtable) {
+        const lead = await getLeadByPhone(from);
+        if (lead) {
+          await updateLead(lead.id, { optedOut: false });
+          await createMessage({
+            leadId: lead.id,
+            body,
+            direction: "in",
+            senderType: "lead",
+            twilioMessageSid: messageSid || undefined,
+          });
+        }
+      }
+      return xmlResponse();
+    }
+
+    if (HELP_KEYWORDS.has(normalized)) {
+      console.log(
+        `[Twilio Webhook] HELP received from ${from.slice(-4)}`
+      );
+      if (hasAirtable) {
+        const lead = await getLeadByPhone(from);
+        if (lead) {
+          await createMessage({
+            leadId: lead.id,
+            body,
+            direction: "in",
+            senderType: "lead",
+            twilioMessageSid: messageSid || undefined,
+          });
+        }
+      }
+      // Return TwiML with a help message
+      const helpTwiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>LeadHandler: Reply STOP to opt out. For support, contact your brokerage directly.</Message></Response>`;
+      return new NextResponse(helpTwiml, {
+        status: 200,
+        headers: { "Content-Type": "text/xml; charset=utf-8" },
+      });
+    }
+
+    // ── Normal message processing ──
+    if (!hasAirtable) {
+      console.warn(
+        "[Twilio Webhook] Airtable not configured; skipping persist"
+      );
+      return xmlResponse();
     }
 
     const lead = await getLeadByPhone(from);
     if (!lead) {
-      console.warn("[Twilio Webhook] No lead found for phone:", from.slice(-4));
-      return twimlResponse();
+      console.warn(
+        "[Twilio Webhook] No lead found for phone:",
+        from.slice(-4)
+      );
+      return xmlResponse();
     }
 
-    if (isOptOut(body)) {
-      await updateLead(lead.id, { status: "do_not_contact", lastMessageAt: new Date().toISOString() });
+    // Check if lead has opted out — log but don't trigger automations
+    if (lead.optedOut === true) {
+      console.log(
+        `[Twilio Webhook] Message from opted-out lead ${from.slice(-4)}; logging only`
+      );
       await createMessage({
         leadId: lead.id,
         body,
@@ -70,19 +168,7 @@ export async function POST(request: NextRequest) {
         senderType: "lead",
         twilioMessageSid: messageSid || undefined,
       });
-      await sendMessage(from, "You have been unsubscribed and will no longer receive messages. Reply START to re-subscribe.", lead.id);
-      return twimlResponse();
-    }
-
-    if (lead.status === "do_not_contact") {
-      await createMessage({
-        leadId: lead.id,
-        body,
-        direction: "in",
-        senderType: "lead",
-        twilioMessageSid: messageSid || undefined,
-      });
-      return twimlResponse();
+      return xmlResponse();
     }
 
     const now = new Date().toISOString();
@@ -105,9 +191,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return twimlResponse();
+    return xmlResponse();
   } catch (err) {
     console.error("[Twilio Webhook]", err);
-    return twimlResponse();
+    return xmlResponse();
   }
 }

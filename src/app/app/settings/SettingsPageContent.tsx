@@ -18,7 +18,7 @@ import { DevTestToolsSection } from "@/components/app/DevTestToolsSection";
 import { DemoToggle } from "@/components/app/DemoToggle";
 
 interface SettingsPageContentProps {
-  session: { name?: string; email?: string; role?: string } | null;
+  session: { name?: string; email?: string; role?: string; platformRole?: string | null } | null;
   brokerage: Brokerage;
   agents: Agent[];
   demoEnabled?: boolean;
@@ -136,6 +136,7 @@ export function SettingsPageContent({
 }: SettingsPageContentProps) {
   const router = useRouter();
   const isOwner = session?.role === "owner" || session?.role === "broker";
+  const isSuperAdmin = session?.platformRole === "super_admin";
 
   const [brokerageName, setBrokerageName] = useState(brokerage.name);
   const [brokeragePhone, setBrokeragePhone] = useState(brokerage.phone ?? "");
@@ -226,9 +227,21 @@ export function SettingsPageContent({
           <TabsTrigger value="billing" className="rounded-lg data-[state=active]:bg-white">
             Billing
           </TabsTrigger>
-          <TabsTrigger value="danger" className="rounded-lg data-[state=active]:bg-white text-red-600">
-            Danger Zone
-          </TabsTrigger>
+          {isSuperAdmin && (
+            <TabsTrigger value="integrations" className="rounded-lg data-[state=active]:bg-white">
+              Integrations
+            </TabsTrigger>
+          )}
+          {isSuperAdmin && (
+            <TabsTrigger value="ai" className="rounded-lg data-[state=active]:bg-white">
+              AI Settings
+            </TabsTrigger>
+          )}
+          {isSuperAdmin && (
+            <TabsTrigger value="danger" className="rounded-lg data-[state=active]:bg-white text-red-600">
+              Danger Zone
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
@@ -371,57 +384,85 @@ export function SettingsPageContent({
           </Card>
         </TabsContent>
 
-        <TabsContent value="danger" className="mt-6">
-          <Card className="rounded-2xl border-2 border-red-200 shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-display text-red-700 flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Danger Zone
-              </CardTitle>
-              <p className="text-sm text-[#a0a0a0] font-sans">Reset demo data or contact support for account changes.</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isOwner && (
-                <div className="rounded-xl border border-red-200 bg-red-50/50 p-4 space-y-2">
-                  <Label className="font-sans font-medium text-[#111111]">Reset Demo Data</Label>
-                  <p className="text-sm text-[#6a6a6a] font-sans">
-                    Clear demo mode state and reset to default. Use this to start a fresh demo experience.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-100 font-sans"
-                    disabled={resetDemoLoading}
-                    onClick={async () => {
-                      setResetDemoLoading(true);
-                      try {
-                        const res = await fetch("/api/demo/reset", { method: "POST", credentials: "include" });
-                        if (typeof window !== "undefined") sessionStorage.clear();
-                        if (res.ok) {
-                          toast.success("Demo data reset");
-                          router.refresh();
-                        } else {
+        {isSuperAdmin && (
+          <TabsContent value="integrations" className="mt-6 space-y-4">
+            <Card className="rounded-2xl border-[#e2e2e2]">
+              <CardHeader>
+                <CardTitle className="font-display">Integrations</CardTitle>
+                <p className="text-sm text-[#a0a0a0] font-sans">Twilio, Airtable, Make.com — platform admin only</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-[#6a6a6a] font-sans">Configure in Advanced (Owner Only) below or via environment variables.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+        {isSuperAdmin && (
+          <TabsContent value="ai" className="mt-6 space-y-4">
+            <Card className="rounded-2xl border-[#e2e2e2]">
+              <CardHeader>
+                <CardTitle className="font-display">AI Settings</CardTitle>
+                <p className="text-sm text-[#a0a0a0] font-sans">Qualification prompts and AI behavior — platform admin only</p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-[#6a6a6a] font-sans">Configure in Advanced (Owner Only) below.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+        {isSuperAdmin && (
+          <TabsContent value="danger" className="mt-6">
+            <Card className="rounded-2xl border-2 border-red-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="font-display text-red-700 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Danger Zone
+                </CardTitle>
+                <p className="text-sm text-[#a0a0a0] font-sans">Reset demo data or contact support for account changes.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isOwner && (
+                  <div className="rounded-xl border border-red-200 bg-red-50/50 p-4 space-y-2">
+                    <Label className="font-sans font-medium text-[#111111]">Reset Demo Data</Label>
+                    <p className="text-sm text-[#6a6a6a] font-sans">
+                      Clear demo mode state and reset to default. Use this to start a fresh demo experience.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="border-red-300 text-red-700 hover:bg-red-100 font-sans"
+                      disabled={resetDemoLoading}
+                      onClick={async () => {
+                        setResetDemoLoading(true);
+                        try {
+                          const res = await fetch("/api/demo/reset", { method: "POST", credentials: "include" });
+                          if (typeof window !== "undefined") sessionStorage.clear();
+                          if (res.ok) {
+                            toast.success("Demo data reset");
+                            router.refresh();
+                          } else {
+                            toast.success("Demo state cleared locally");
+                            router.refresh();
+                          }
+                        } catch {
+                          if (typeof window !== "undefined") sessionStorage.clear();
                           toast.success("Demo state cleared locally");
                           router.refresh();
+                        } finally {
+                          setResetDemoLoading(false);
                         }
-                      } catch {
-                        if (typeof window !== "undefined") sessionStorage.clear();
-                        toast.success("Demo state cleared locally");
-                        router.refresh();
-                      } finally {
-                        setResetDemoLoading(false);
-                      }
-                    }}
-                  >
-                    {resetDemoLoading ? "Resetting…" : "Reset Demo Data"}
-                  </Button>
-                </div>
-              )}
-              <p className="text-sm text-[#6a6a6a] font-sans">
-                To delete your account, contact support.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                      }}
+                    >
+                      {resetDemoLoading ? "Resetting…" : "Reset Demo Data"}
+                    </Button>
+                  </div>
+                )}
+                <p className="text-sm text-[#6a6a6a] font-sans">
+                  To delete your account, contact support.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
 
       {showAdvanced && (

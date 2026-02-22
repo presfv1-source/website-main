@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getSession, getDemoEnabled } from "@/lib/auth";
-import { hasAirtable } from "@/lib/config";
+import { getBrokerageByEmail } from "@/lib/airtable";
+import { hasAirtable, isA2PReady } from "@/lib/config";
 import { AppShell } from "@/components/app/AppShell";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -9,8 +10,22 @@ export const dynamic = "force-dynamic";
 async function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   const demoEnabled = await getDemoEnabled(session);
+  // Prefer Airtable brokerage status for banner (synced by Stripe webhook)
+  let subscriptionStatus = session?.subscriptionStatus;
+  if (session?.email && !session.isDemo && hasAirtable) {
+    const brokerage = await getBrokerageByEmail(session.email);
+    if (brokerage?.status) subscriptionStatus = brokerage.status;
+  }
+  const sessionWithStatus = session
+    ? { ...session, subscriptionStatus }
+    : null;
   return (
-    <AppShell session={session} demoEnabled={demoEnabled} hasBackendConnected={hasAirtable}>
+    <AppShell
+      session={sessionWithStatus}
+      demoEnabled={demoEnabled}
+      hasBackendConnected={hasAirtable}
+      isA2PReady={isA2PReady}
+    >
       {children}
     </AppShell>
   );

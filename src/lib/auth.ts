@@ -17,6 +17,10 @@ export interface Session {
   email?: string;
   isDemo: boolean;
   agentId?: string;
+  /** Only "super_admin" for platform owner (Preston). null for all customers. */
+  platformRole: "super_admin" | null;
+  /** Stripe subscription status synced from webhook. */
+  subscriptionStatus?: string;
 }
 
 const VIEW_AS_COOKIE = "lh_view_as";
@@ -72,7 +76,12 @@ export async function getSession(): Promise<Session | null> {
   const email =
     user.primaryEmailAddress?.emailAddress?.trim() ??
     user.emailAddresses?.[0]?.emailAddress?.trim();
-  const meta = user.publicMetadata as { role?: string; agentId?: string } | undefined;
+  const meta = user.publicMetadata as {
+    role?: string;
+    agentId?: string;
+    platform_role?: string;
+    subscription_status?: string;
+  } | undefined;
   let role: Role = toRole(meta?.role);
   let agentId: string | undefined =
     typeof meta?.agentId === "string" ? meta.agentId : undefined;
@@ -115,6 +124,19 @@ export async function getSession(): Promise<Session | null> {
     role === "owner" &&
     (demoCookie === "true" || (demoCookie !== "false" && env.server.DEMO_MODE_DEFAULT));
 
+  // Determine platform role: super_admin if email matches DEV_ADMIN_EMAIL
+  // or if Clerk metadata has platform_role = "super_admin"
+  const devAdmin = env.server.DEV_ADMIN_EMAIL?.trim().toLowerCase();
+  const platformRole: "super_admin" | null =
+    (meta?.platform_role === "super_admin") ||
+    (email && devAdmin && email.toLowerCase() === devAdmin)
+      ? "super_admin"
+      : null;
+
+  // Read subscription status from Clerk metadata (synced by Stripe webhook)
+  const subscriptionStatus =
+    typeof meta?.subscription_status === "string" ? meta.subscription_status : undefined;
+
   return {
     userId,
     role,
@@ -123,6 +145,8 @@ export async function getSession(): Promise<Session | null> {
     email: email ?? undefined,
     isDemo,
     agentId,
+    platformRole,
+    subscriptionStatus,
   };
 }
 

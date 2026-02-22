@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { hasAirtable } from "@/lib/config";
 import { getDemoEnabled, getSessionToken } from "@/lib/auth";
+import { requireBrokerOwner } from "@/lib/guards";
 import { AirtableAuthError, updateAgent } from "@/lib/airtable";
 import type { Agent } from "@/lib/types";
 
@@ -11,19 +12,9 @@ export async function PATCH(
 ) {
   try {
     const session = await getSessionToken(request);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in required" } },
-        { status: 401 }
-      );
-    }
-    if (session.role === "agent") {
-      return NextResponse.json(
-        { success: false, error: { code: "FORBIDDEN", message: "Only owners and brokers can edit agents." } },
-        { status: 403 }
-      );
-    }
-    const demo = await getDemoEnabled(session);
+    const deny = requireBrokerOwner(session);
+    if (deny) return deny;
+    const demo = await getDemoEnabled(session!);
     const { id } = await params;
     if (!id) {
       return NextResponse.json(

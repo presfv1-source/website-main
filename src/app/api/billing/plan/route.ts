@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getAirtableUserPlan } from "@/lib/airtable";
+import { getAirtableUserPlan, getBrokerageByEmail } from "@/lib/airtable";
 import { hasStripe } from "@/lib/config";
 
 export type PlanId = "free" | "essentials" | "pro";
+
+export type SubscriptionStatus = "active" | "inactive" | "past_due" | "canceled";
 
 export async function GET() {
   try {
@@ -24,9 +26,16 @@ export async function GET() {
       });
     }
 
-    const plan = await getAirtableUserPlan(email);
+    const [plan, brokerage] = await Promise.all([
+      getAirtableUserPlan(email),
+      getBrokerageByEmail(email),
+    ]);
     const planId: PlanId = plan === "essentials" || plan === "pro" ? plan : "free";
-    return NextResponse.json({ success: true, data: { planId, hasStripe } });
+    const subscriptionStatus: SubscriptionStatus | undefined = brokerage?.status;
+    return NextResponse.json({
+      success: true,
+      data: { planId, hasStripe, subscriptionStatus },
+    });
   } catch {
     return NextResponse.json({
       success: true,

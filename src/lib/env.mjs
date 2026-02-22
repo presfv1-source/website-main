@@ -35,6 +35,8 @@ const serverSchema = z.object({
   SESSION_SECRET: z.string().min(16).default("super-secret-for-demo-only-change-in-prod"),
   /** Broker email allowed for dev/direct login (no real auth yet) */
   DEV_ADMIN_EMAIL: z.string().default(""),
+  /** Set to "true" when Twilio A2P 10DLC campaign is approved. Default false. */
+  A2P_READY: z.string().default("false"),
   /** NextAuth (v5): secret for JWT/session; set in production */
   NEXTAUTH_SECRET: z.string().default(""),
   /** NextAuth: app URL (e.g. http://localhost:3000) */
@@ -97,6 +99,7 @@ function parseEnv() {
     DEMO_MODE_DEFAULT: process.env.DEMO_MODE_DEFAULT ?? "false",
     SESSION_SECRET: process.env.SESSION_SECRET,
     DEV_ADMIN_EMAIL: process.env.DEV_ADMIN_EMAIL,
+    A2P_READY: process.env.A2P_READY ?? "false",
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

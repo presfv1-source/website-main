@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { getSession } from "@/lib/auth";
+import { requireBrokerOwner } from "@/lib/guards";
 
 type ClerkMetadata = {
   role?: string;
@@ -14,12 +15,8 @@ type ClerkMetadata = {
 
 export async function GET() {
   const session = await getSession();
-  if (!session || (session.role !== "owner" && session.role !== "broker")) {
-    return NextResponse.json(
-      { success: false, error: { code: "FORBIDDEN", message: "Only owner or broker can view escalation settings" } },
-      { status: 403 }
-    );
-  }
+  const deny = requireBrokerOwner(session);
+  if (deny) return deny;
 
   const user = await currentUser();
   if (!user?.id) {
@@ -44,12 +41,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
-  if (!session || (session.role !== "owner" && session.role !== "broker")) {
-    return NextResponse.json(
-      { success: false, error: { code: "FORBIDDEN", message: "Only owner or broker can update escalation settings" } },
-      { status: 403 }
-    );
-  }
+  const deny = requireBrokerOwner(session);
+  if (deny) return deny;
 
   const user = await currentUser();
   if (!user?.id) {

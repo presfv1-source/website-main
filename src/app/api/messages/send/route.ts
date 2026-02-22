@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getDemoEnabled, getSessionToken } from "@/lib/auth";
+import { isA2PReady } from "@/lib/config";
+import { canSendOutbound, requireAuth } from "@/lib/guards";
 import { appendMessage } from "@/lib/demo/data";
 import { sendMessage } from "@/lib/twilio";
 
@@ -20,13 +22,24 @@ export async function POST(request: NextRequest) {
   }
   try {
     const session = await getSessionToken(request);
-    if (!session) {
+    const deny = requireAuth(session);
+    if (deny) return deny;
+    // ── Outbound send gate: check subscription + A2P ──
+    const sendCheck = canSendOutbound(session!.subscriptionStatus, isA2PReady);
+    if (!sendCheck.allowed) {
       return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in to send messages" } },
-        { status: 401 }
+        {
+          success: false,
+          queued: !isA2PReady,
+          error: {
+            code: "SEND_BLOCKED",
+            message: sendCheck.reason ?? "Sending not available",
+          },
+        },
+        { status: 403 }
       );
     }
-    const demo = await getDemoEnabled(session);
+    const demo = await getDemoEnabled(session!);
     const { to, body, leadId } = parsed.data;
     if (demo && leadId) {
       appendMessage(leadId, body, "out");

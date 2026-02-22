@@ -55,7 +55,7 @@ async function SettingsContent() {
 
   return (
     <SettingsPageContent
-      session={session ? { name: session.name, email: session.email, role: session.role } : null}
+      session={session ? { name: session.name, email: session.email, role: session.role, platformRole: session.platformRole } : null}
       brokerage={brokerage}
       agents={agents}
       demoEnabled={!!demoEnabled}

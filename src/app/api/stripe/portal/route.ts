@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { getSessionToken } from "@/lib/auth";
+import { requireBrokerOwner } from "@/lib/guards";
 import { createPortal } from "@/lib/stripe";
 
 export async function POST() {
   try {
     const session = await getSessionToken();
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in to manage billing" } },
-        { status: 401 }
-      );
-    }
-    if (session.role === "agent") {
-      return NextResponse.json(
-        { success: false, error: { code: "FORBIDDEN", message: "Only owners can manage billing" } },
-        { status: 403 }
-      );
-    }
-    const url = await createPortal(session.userId, session.email);
+    const deny = requireBrokerOwner(session);
+    if (deny) return deny;
+    const url = await createPortal(session!.userId, session!.email);
     return NextResponse.json({ success: true, data: { url } });
   } catch (err) {
     console.error("[stripe/portal POST]", err);

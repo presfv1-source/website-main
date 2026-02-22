@@ -38,9 +38,10 @@ const agentNav = [
 interface SidebarProps {
   role?: Role;
   className?: string;
+  isSuperAdmin?: boolean;
 }
 
-export function Sidebar({ role: roleProp, className }: SidebarProps) {
+export function Sidebar({ role: roleProp, className, isSuperAdmin: isSuperAdminProp = false }: SidebarProps) {
   const pathname = usePathname();
   const { user, signOut } = useClerk();
   const { role: roleFromHook } = useUser();
@@ -106,7 +107,7 @@ export function Sidebar({ role: roleProp, className }: SidebarProps) {
         <div className="min-w-0">
           <p className="text-sm font-medium text-[#111111] truncate">{firstName}</p>
           <p className="text-xs text-[#a0a0a0] font-sans">
-            {isOwnerRole ? "Owner" : "Agent"}
+            {isSuperAdminProp ? "Platform Admin" : isOwnerRole ? "Broker Owner" : "Agent"}
           </p>
         </div>
       </div>
@@ -151,9 +152,11 @@ export function Sidebar({ role: roleProp, className }: SidebarProps) {
 export function SidebarNavContent({
   role,
   onLinkClick,
+  isSuperAdmin: isSuperAdminProp = false,
 }: {
   role: Role;
   onLinkClick?: () => void;
+  isSuperAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const isOwner = role === "owner" || role === "broker";

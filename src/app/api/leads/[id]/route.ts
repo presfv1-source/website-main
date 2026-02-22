@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hasAirtable } from "@/lib/config";
 import { getDemoLeadById, getDemoLeads } from "@/lib/demo/data";
 import { getDemoEnabled, getSessionToken } from "@/lib/auth";
+import { requireAuth, requireBrokerOwner } from "@/lib/guards";
 import { updateLead, deleteLead } from "@/lib/airtable";
 import { triggerWebhook } from "@/lib/make";
 
@@ -11,18 +12,14 @@ export async function PATCH(
 ) {
   try {
     const session = await getSessionToken(request);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in to update leads" } },
-        { status: 401 }
-      );
-    }
+    const deny = requireAuth(session);
+    if (deny) return deny;
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
     const status = body.status as string | undefined;
     const assignedTo = body.assignedTo as string | undefined;
 
-    const demo = await getDemoEnabled(session);
+    const demo = await getDemoEnabled(session!);
     if (demo) {
       const leads = getDemoLeads();
       const lead = leads.find((l) => l.id === id) ?? getDemoLeadById(id);
@@ -97,21 +94,11 @@ export async function DELETE(
 ) {
   try {
     const session = await getSessionToken();
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in to delete leads" } },
-        { status: 401 }
-      );
-    }
-    if (session.role === "agent") {
-      return NextResponse.json(
-        { success: false, error: { code: "FORBIDDEN", message: "Only owners can delete leads" } },
-        { status: 403 }
-      );
-    }
+    const deny = requireBrokerOwner(session);
+    if (deny) return deny;
     const { id } = await params;
 
-    const demo = await getDemoEnabled(session);
+    const demo = await getDemoEnabled(session!);
     if (demo) {
       return NextResponse.json({ success: true, data: { deleted: true } });
     }

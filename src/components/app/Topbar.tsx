@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarNavContent } from "./Sidebar";
-import { DemoModeBanner } from "./DemoModeBanner";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
@@ -32,6 +31,8 @@ interface TopbarProps {
   session: { name?: string; role: Role; effectiveRole?: Role } | null;
   demoEnabled: boolean;
   isOwner: boolean;
+  isSuperAdmin?: boolean;
+  onDemoToggle?: (enabled: boolean) => void;
   className?: string;
 }
 
@@ -39,6 +40,8 @@ export function Topbar({
   session,
   demoEnabled,
   isOwner,
+  isSuperAdmin: isSuperAdminProp = false,
+  onDemoToggle,
   className,
 }: TopbarProps) {
   const router = useRouter();
@@ -63,8 +66,11 @@ export function Topbar({
 
   const effectiveRole = session?.effectiveRole ?? session?.role ?? "agent";
   const realRole = session?.role;
-  const roleLabel =
-    effectiveRole === "owner" ? "Owner" : effectiveRole === "broker" ? "Broker" : "Agent";
+  const roleLabel = isSuperAdminProp
+    ? "Platform Admin"
+    : effectiveRole === "owner" || effectiveRole === "broker"
+      ? "Broker Owner"
+      : "Agent";
   const displayName = session?.name ?? "User";
   const initials = displayName
     .split(" ")
@@ -108,7 +114,6 @@ export function Topbar({
               />
             </SheetContent>
           </Sheet>
-          <DemoModeBanner demoEnabled={demoEnabled} />
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -143,7 +148,7 @@ export function Topbar({
                   </span>
                 </div>
               </DropdownMenuLabel>
-              {realRole === "owner" && (
+              {isSuperAdminProp && realRole === "owner" && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel className="text-xs font-normal text-[#a0a0a0]">

@@ -1,5 +1,17 @@
 export type Role = "owner" | "broker" | "agent";
 
+/** Platform-level role. Only "super_admin" (Preston) has this set. */
+export type PlatformRole = "super_admin" | null;
+
+/** Stripe subscription lifecycle status. */
+export type SubscriptionStatus =
+  | "active"
+  | "trialing"
+  | "past_due"
+  | "canceled"
+  | "inactive"
+  | "unknown";
+
 export type LeadStatus =
   | "new"
   | "contacted"

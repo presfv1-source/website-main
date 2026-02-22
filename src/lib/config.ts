@@ -17,12 +17,16 @@ export const hasLlm =
 
 export const demoDefault = env.server.DEMO_MODE_DEFAULT;
 
+/** True when Twilio A2P 10DLC campaign is approved and outbound sending is safe. */
+export const isA2PReady = env.server.A2P_READY === "true";
+
 export function getEnvSummary(): {
   hasAirtable: boolean;
   hasStripe: boolean;
   hasTwilio: boolean;
   hasMake: boolean;
   hasLlm: boolean;
+  isA2PReady: boolean;
 } {
   return {
     hasAirtable,
@@ -30,5 +34,6 @@ export function getEnvSummary(): {
     hasTwilio,
     hasMake,
     hasLlm,
+    isA2PReady,
   };
 }

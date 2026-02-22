@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { hasAirtable } from "@/lib/config";
 import { getDemoAgentsAsAppType } from "@/lib/demoData";
 import { getDemoEnabled, getSessionToken } from "@/lib/auth";
+import { requireBrokerOwner } from "@/lib/guards";
 import { AirtableAuthError, createAgent } from "@/lib/airtable";
 import type { Agent } from "@/lib/types";
 
@@ -41,18 +42,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getSessionToken(request);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: { code: "UNAUTHORIZED", message: "Sign in required" } },
-        { status: 401 }
-      );
-    }
-    if (session.role === "agent") {
-      return NextResponse.json(
-        { success: false, error: { code: "FORBIDDEN", message: "Only owners and brokers can add agents." } },
-        { status: 403 }
-      );
-    }
+    const deny = requireBrokerOwner(session);
+    if (deny) return deny;
     const body = await request.json().catch(() => ({}));
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim() : "";
@@ -64,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const demo = await getDemoEnabled(session);
+    const demo = await getDemoEnabled(session!);
     if (demo) {
       const synthetic: Agent = {
         id: `agent-demo-${Date.now()}`,

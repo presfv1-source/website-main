@@ -136,6 +136,8 @@ export interface AirtableLead {
   budgetMin: number | null;
   budgetMax: number | null;
   notes: string;
+  /** Set by STOP keyword; when true, no outbound messages to this lead. */
+  optedOut?: boolean;
 }
 
 export interface AirtableMessage {
@@ -727,6 +729,7 @@ type LeadFields = {
   "Budget Max"?: number;
   Notes?: string;
   Brokerage?: string[];
+  "Opted Out"?: boolean;
 };
 
 const LEAD_SOURCES = [
@@ -805,6 +808,7 @@ function recordToLead(r: AirtableRecord<LeadFields>): AirtableLead {
     budgetMin: typeof f["Budget Min"] === "number" ? f["Budget Min"] : null,
     budgetMax: typeof f["Budget Max"] === "number" ? f["Budget Max"] : null,
     notes: (f.Notes ?? "").toString().trim(),
+    optedOut: f["Opted Out"] === true,
   };
 }
 
@@ -1025,6 +1029,7 @@ export async function updateLead(
     lastMessageAt?: string;
     notes?: string;
     intent?: string;
+    optedOut?: boolean;
   }
 ): Promise<LeadCompat> {
   if (!hasAirtable) {
@@ -1051,6 +1056,9 @@ export async function updateLead(
   if (data.assignedAt != null) fields["Assigned At"] = data.assignedAt;
   if (data.notes != null) fields["Notes"] = data.notes;
   if (data.intent != null) fields["Intent"] = data.intent;
+  if ("optedOut" in data) {
+    fields["Opted Out"] = Boolean(data.optedOut);
+  }
   if (Object.keys(fields).length === 0) {
     const lead = await getLeadById(id);
     if (!lead) throw new Error("Lead not found");

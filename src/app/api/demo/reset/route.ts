@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSessionToken } from "@/lib/auth";
+import { requireBrokerOwner } from "@/lib/guards";
 
 const DEMO_COOKIE = "lh_demo";
 
@@ -10,12 +11,8 @@ const DEMO_COOKIE = "lh_demo";
  */
 export async function POST() {
   const session = await getSessionToken();
-  if (!session || session.role === "agent") {
-    return NextResponse.json(
-      { success: false, error: { code: "FORBIDDEN", message: "Not allowed" } },
-      { status: 403 }
-    );
-  }
+  const deny = requireBrokerOwner(session);
+  if (deny) return deny;
   const res = NextResponse.json({ success: true });
   res.cookies.set(DEMO_COOKIE, "", {
     httpOnly: true,

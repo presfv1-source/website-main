@@ -6,7 +6,9 @@
  * should import Navbar from @/components/marketing/Navbar.
  */
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Zap, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -16,10 +18,45 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/#features", label: "Features" },
-  { href: "/#pricing", label: "Pricing" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
 ] as const;
 
+function scrollToHash(hash: string, retries = 5) {
+  if (!hash) return;
+  const id = hash.replace("#", "");
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  } else if (retries > 0) {
+    setTimeout(() => scrollToHash(hash, retries - 1), 150);
+  }
+}
+
 export function MarketingHeader({ className }: { className?: string }) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const timer = setTimeout(() => scrollToHash(window.location.hash), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname]);
+
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!href.includes("#")) return;
+    const [route, hash] = href.split("#");
+    const targetRoute = route || "/";
+    if (pathname === targetRoute || (pathname === "/" && targetRoute === "/")) {
+      e.preventDefault();
+      scrollToHash(`#${hash}`);
+    } else {
+      e.preventDefault();
+      router.push(`${targetRoute}#${hash}`);
+    }
+  }
+
   return (
     <header
       className={cn(
@@ -50,6 +87,7 @@ export function MarketingHeader({ className }: { className?: string }) {
             <Link
               key={`${href}-${label}`}
               href={href}
+              onClick={(e) => handleNavClick(e, href)}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
             >
               {label}
@@ -90,6 +128,7 @@ export function MarketingHeader({ className }: { className?: string }) {
                   <Link
                     key={`${href}-${label}`}
                     href={href}
+                    onClick={(e) => handleNavClick(e, href)}
                     className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   >
                     {label}

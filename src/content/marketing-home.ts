@@ -25,7 +25,7 @@ export const INTEGRATIONS = [
   { name: "Zillow", slug: "zillow" },
   { name: "Realtor.com", slug: "realtor" },
   { name: "Your CRM", slug: "crm" },
-  { name: "Twilio", slug: "twilio" },
+  { name: "SMS", slug: "sms" },
 ] as const;
 
 export const TESTIMONIALS_HOME = [

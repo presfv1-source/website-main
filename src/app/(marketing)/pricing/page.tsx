@@ -52,7 +52,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Do I need technical setup?",
-    a: "No dev needed. Setup takes under 30 minutes. We'll guide you through connecting your lead sources and Twilio.",
+    a: "No technical setup needed. We'll help you connect your lead sources.",
   },
   {
     q: "What happens after the beta?",

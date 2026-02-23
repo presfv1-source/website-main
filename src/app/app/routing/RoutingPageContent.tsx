@@ -1,6 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { PageHeader } from "@/components/app/PageHeader";
 import { UpgradeCard } from "@/components/app/UpgradeCard";
 import { AirtableErrorFallback } from "@/components/app/AirtableErrorFallback";
@@ -37,6 +54,76 @@ interface RoutingPageContentProps {
   airtableError: boolean;
 }
 
+const initialOrderFromAgents = (agents: Agent[]): string[] => {
+  return [...agents]
+    .sort((a, b) => (b.roundRobinWeight ?? 5) - (a.roundRobinWeight ?? 5))
+    .map((a) => a.id);
+};
+
+function SortableAgentRow({
+  agent,
+  index,
+  weights,
+  setWeights,
+  isPro,
+}: {
+  agent: Agent;
+  index: number;
+  weights: Record<string, number>;
+  setWeights: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+  isPro: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: agent.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      className={cn("border-[#f0f0f0]", isDragging && "opacity-50 bg-[#fafafa]")}
+    >
+      <TableCell className="text-[#a0a0a0] cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
+        <GripVertical className="h-4 w-4" />
+      </TableCell>
+      <TableCell className="font-medium font-sans">{agent.name}</TableCell>
+      <TableCell>
+        <Switch checked={agent.active} disabled />
+      </TableCell>
+      <TableCell className="font-sans text-[#6a6a6a]">{index + 1}</TableCell>
+      <TableCell className="font-sans text-[#6a6a6a]">
+        {agent.metrics?.leadsAssigned ?? 0}
+      </TableCell>
+      {isPro && (
+        <TableCell>
+          <Input
+            type="number"
+            min={1}
+            max={10}
+            value={weights[agent.id] ?? 5}
+            onChange={(e) => {
+              const n = parseInt(e.target.value, 10);
+              if (!Number.isNaN(n) && n >= 1 && n <= 10)
+                setWeights((prev) => ({ ...prev, [agent.id]: n }));
+            }}
+            className="h-9 w-20 font-sans"
+          />
+        </TableCell>
+      )}
+    </TableRow>
+  );
+}
+
 export function RoutingPageContent({
   agents,
   demoEnabled,
@@ -44,6 +131,8 @@ export function RoutingPageContent({
 }: RoutingPageContentProps) {
   const { isPro } = useUser();
   const [mode, setMode] = useState<Mode>("round-robin");
+  const [orderedIds, setOrderedIds] = useState<string[]>(() => initialOrderFromAgents(agents));
+  const [orderDirty, setOrderDirty] = useState(false);
   const [weights, setWeights] = useState<Record<string, number>>(() => {
     const init: Record<string, number> = {};
     agents.forEach((a) => {
@@ -55,6 +144,43 @@ export function RoutingPageContent({
   const [escalationTarget, setEscalationTarget] = useState("");
   const [saving, setSaving] = useState(false);
   const [savingEscalation, setSavingEscalation] = useState(false);
+
+  const agentsById = useMemo(() => {
+    const m: Record<string, Agent> = {};
+    agents.forEach((a) => {
+      m[a.id] = a;
+    });
+    return m;
+  }, [agents]);
+
+  const orderedAgents = useMemo(
+    () => orderedIds.map((id) => agentsById[id]).filter(Boolean),
+    [orderedIds, agentsById]
+  );
+
+  useEffect(() => {
+    setOrderedIds((prev) => {
+      const current = new Set(prev);
+      const added = agents.filter((a) => !current.has(a.id)).map((a) => a.id);
+      if (added.length === 0) return prev;
+      return [...prev, ...added];
+    });
+  }, [agents]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const i = orderedIds.indexOf(active.id as string);
+    const j = orderedIds.indexOf(over.id as string);
+    if (i === -1 || j === -1) return;
+    setOrderedIds((prev) => arrayMove(prev, i, j));
+    setOrderDirty(true);
+  }
 
   useEffect(() => {
     if (!isPro || demoEnabled) return;
@@ -74,18 +200,28 @@ export function RoutingPageContent({
     setSaving(true);
     try {
       if (demoEnabled) {
-        toast.success("Demo mode: routing settings not persisted.");
+        toast.success("Demo mode: routing order saved.");
+        setOrderDirty(false);
         setSaving(false);
         return;
       }
+      const weightsFromOrder: Record<string, number> = {};
+      orderedIds.forEach((id, idx) => {
+        weightsFromOrder[id] = Math.max(1, 10 - idx);
+      });
       const res = await fetch("/api/routing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ weights }),
+        body: JSON.stringify({ weights: weightsFromOrder }),
       });
       const data = await res.json();
-      if (data.success) toast.success("Routing settings saved.");
-      else toast.error(data.error?.message ?? "Could not save");
+      if (data.success) {
+        toast.success("Routing settings saved.");
+        setOrderDirty(false);
+        setWeights((prev) => ({ ...prev, ...weightsFromOrder }));
+      } else {
+        toast.error(data.error?.message ?? "Could not save");
+      }
     } catch {
       toast.error("Could not save routing settings");
     } finally {
@@ -207,61 +343,57 @@ export function RoutingPageContent({
       <Card className="rounded-2xl border-[#e2e2e2]">
         <CardHeader>
           <h2 className="font-display font-semibold text-[#111111]">Agent Queue</h2>
+          <p className="text-sm text-[#a0a0a0] font-sans mt-1">
+            Drag agents to set distribution order. The agent at the top receives leads first.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-[#e2e2e2]">
-                  <TableHead className="w-10 font-sans text-[#6a6a6a]"></TableHead>
-                  <TableHead className="font-sans text-[#6a6a6a]">Agent</TableHead>
-                  <TableHead className="font-sans text-[#6a6a6a]">Active</TableHead>
-                  <TableHead className="font-sans text-[#6a6a6a]">Priority</TableHead>
-                  <TableHead className="font-sans text-[#6a6a6a]">Leads today</TableHead>
-                  {isPro && (
-                    <TableHead className="font-sans text-[#6a6a6a]">Weight %</TableHead>
-                  )}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {agents.map((a, idx) => (
-                  <TableRow key={a.id} className="border-[#f0f0f0]">
-                    <TableCell className="text-[#a0a0a0]">
-                      <GripVertical className="h-4 w-4" />
-                    </TableCell>
-                    <TableCell className="font-medium font-sans">{a.name}</TableCell>
-                    <TableCell>
-                      <Switch checked={a.active} disabled />
-                    </TableCell>
-                    <TableCell className="font-sans text-[#6a6a6a]">{idx + 1}</TableCell>
-                    <TableCell className="font-sans text-[#6a6a6a]">
-                      {a.metrics?.leadsAssigned ?? 0}
-                    </TableCell>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-[#e2e2e2]">
+                    <TableHead className="w-10 font-sans text-[#6a6a6a]"></TableHead>
+                    <TableHead className="font-sans text-[#6a6a6a]">Agent</TableHead>
+                    <TableHead className="font-sans text-[#6a6a6a]">Active</TableHead>
+                    <TableHead className="font-sans text-[#6a6a6a]">Priority</TableHead>
+                    <TableHead className="font-sans text-[#6a6a6a]">Leads today</TableHead>
                     {isPro && (
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={10}
-                          value={weights[a.id] ?? 5}
-                          onChange={(e) => {
-                            const n = parseInt(e.target.value, 10);
-                            if (!Number.isNaN(n) && n >= 1 && n <= 10)
-                              setWeights((prev) => ({ ...prev, [a.id]: n }));
-                          }}
-                          className="h-9 w-20 font-sans"
-                        />
-                      </TableCell>
+                      <TableHead className="font-sans text-[#6a6a6a]">Weight %</TableHead>
                     )}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  <SortableContext
+                    items={orderedIds}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {orderedAgents.map((agent, idx) => (
+                      <SortableAgentRow
+                        key={agent.id}
+                        agent={agent}
+                        index={idx}
+                        weights={weights}
+                        setWeights={setWeights}
+                        isPro={isPro}
+                      />
+                    ))}
+                  </SortableContext>
+                </TableBody>
+              </Table>
+            </DndContext>
           </div>
           <Button
             onClick={handleSave}
-            disabled={saving}
-            className="mt-4 bg-[#111111] hover:opacity-90 font-sans"
+            disabled={saving || !orderDirty}
+            className={cn(
+              "mt-4 font-sans",
+              orderDirty ? "bg-[#111111] hover:opacity-90" : "bg-[#e2e2e2] text-[#6a6a6a] cursor-not-allowed"
+            )}
           >
             Save Changes
           </Button>

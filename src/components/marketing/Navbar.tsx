@@ -1,17 +1,63 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#features", label: "Features" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
 ] as const;
 
+/**
+ * FIX 1 — Marketing nav bug
+ * Smooth-scroll to an anchor if the hash matches an element on the current page.
+ * Uses a retry loop to handle elements that haven't rendered yet (e.g. after navigation).
+ */
+function scrollToHash(hash: string, retries = 5) {
+  if (!hash) return;
+  const id = hash.replace("#", "");
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  } else if (retries > 0) {
+    setTimeout(() => scrollToHash(hash, retries - 1), 150);
+  }
+}
+
 export function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const timer = setTimeout(() => scrollToHash(window.location.hash), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname]);
+
+  function handleNavClick(
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) {
+    if (!href.includes("#")) return;
+
+    const [route, hash] = href.split("#");
+    const targetRoute = route || "/";
+
+    if (pathname === targetRoute || (pathname === "/" && targetRoute === "/")) {
+      e.preventDefault();
+      scrollToHash(`#${hash}`);
+    } else {
+      e.preventDefault();
+      router.push(`${targetRoute}#${hash}`);
+    }
+  }
+
   return (
     <nav
       className="sticky top-0 z-[100] border-b border-[var(--border)] bg-white/95 backdrop-blur-[18px]"
@@ -46,6 +92,7 @@ export function Navbar() {
             <li key={href}>
               <Link
                 href={href}
+                onClick={(e) => handleNavClick(e, href)}
                 className="rounded-lg px-3 py-1.5 text-[13.5px] font-medium text-[var(--muted)] no-underline transition-all duration-[0.14s] hover:bg-[var(--off)] hover:text-[var(--ink)]"
               >
                 {label}
@@ -62,39 +109,35 @@ export function Navbar() {
             Log in
           </Link>
           <Link
-            href="#beta-form"
+            href="/#beta-form"
+            onClick={(e) => handleNavClick(e, "/#beta-form")}
             className="inline-flex items-center rounded-lg bg-[var(--ink)] px-4 py-2 text-[13.5px] font-semibold text-white no-underline tracking-[-0.1px] transition-opacity duration-[0.14s] hover:opacity-80"
           >
             Request beta access
           </Link>
           <Sheet>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 max-w-[calc(100vw-2rem)] pt-12">
-              <nav className="flex flex-col gap-1" aria-label="Main">
+              <nav className="flex flex-col gap-2" aria-label="Mobile">
                 {navLinks.map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-[var(--muted)] hover:bg-[var(--off)] hover:text-[var(--ink)]"
+                    onClick={(e) => handleNavClick(e, href)}
+                    className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50"
                   >
                     {label}
                   </Link>
                 ))}
                 <Link
                   href="/login"
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-[var(--muted)] hover:bg-[var(--off)]"
+                  className="rounded-lg px-4 py-3 min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:bg-gray-50"
                 >
                   Log in
-                </Link>
-                <Link
-                  href="#beta-form"
-                  className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--ink)] px-4 py-3 text-sm font-semibold text-white no-underline"
-                >
-                  Request beta access
                 </Link>
               </nav>
             </SheetContent>

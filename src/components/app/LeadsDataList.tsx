@@ -33,15 +33,15 @@ import type { Lead } from "@/lib/types";
 
 const PAGE_SIZE = 10;
 
-// Real sources: Integrate via webhooks/emails later (Zillow API, Realtor webhooks, etc.) – for now demo only.
-const SOURCE_OPTIONS = ["All", "Zillow", "Realtor.com", "Website", "HAR", "Facebook Leads", "Referral", "Open house", "Other"] as const;
+// Selectable source filters. HAR.com and Zillow are shown as disabled "Coming soon" in the dropdown.
+const SOURCE_OPTIONS = ["All", "Realtor.com", "Website", "Facebook Leads", "Referral", "Open house", "Other"] as const;
 type SourceFilterValue = (typeof SOURCE_OPTIONS)[number];
 
 function normalizeSource(s: string | undefined): string {
   return (s ?? "").trim().toLowerCase();
 }
 
-const KNOWN_SOURCES = ["zillow", "realtor.com", "website", "facebook leads", "har", "referral", "open house"];
+const KNOWN_SOURCES = ["zillow", "realtor.com", "website", "facebook leads", "har", "har.com", "referral", "open house"];
 
 /** Treat empty or unknown source as "Other" for filtering. */
 function sourceMatchesFilter(leadSource: string | undefined, filter: SourceFilterValue): boolean {
@@ -154,7 +154,7 @@ export function LeadsDataList({ leads }: LeadsDataListProps) {
       {/* Source filter + Search */}
       <div className="flex flex-wrap items-center gap-2">
         <Select value={sourceFilter} onValueChange={(v) => setSourceFilter(v as SourceFilterValue)}>
-          <SelectTrigger className="w-[140px] h-9" size="default">
+          <SelectTrigger className="w-[160px] h-9" size="default">
             <SelectValue placeholder="Source" />
           </SelectTrigger>
           <SelectContent>
@@ -163,6 +163,22 @@ export function LeadsDataList({ leads }: LeadsDataListProps) {
                 {opt}
               </SelectItem>
             ))}
+            <SelectItem value="__har_com__" disabled className="opacity-80">
+              <span className="flex items-center gap-2">
+                HAR.com
+                <span className="rounded bg-[#f5f5f5] px-1.5 py-0.5 text-[10px] font-medium text-[#6a6a6a]">
+                  Coming soon
+                </span>
+              </span>
+            </SelectItem>
+            <SelectItem value="__zillow__" disabled className="opacity-80">
+              <span className="flex items-center gap-2">
+                Zillow
+                <span className="rounded bg-[#f5f5f5] px-1.5 py-0.5 text-[10px] font-medium text-[#6a6a6a]">
+                  Coming soon
+                </span>
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
         <div className="relative flex-1 min-w-[200px] max-w-sm">

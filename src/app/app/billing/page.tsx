@@ -7,5 +7,6 @@ export const dynamic = "force-dynamic";
 export default async function BillingPage() {
   const session = await getSession();
   if (session?.role === "agent") redirect("/app/leads");
-  return <BillingPageClient />;
+  const isSuperAdmin = session?.platformRole === "super_admin";
+  return <BillingPageClient isSuperAdmin={isSuperAdmin} />;
 }

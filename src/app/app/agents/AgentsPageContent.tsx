@@ -113,10 +113,13 @@ export function AgentsPageContent({
                       }
                     />
                     <span className="text-xs text-[#6a6a6a]">
-                      {agent.active ? "Available" : "Unavailable"}
+                      Accepting Leads
                     </span>
                   </div>
                 </div>
+                <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium font-sans shrink-0 bg-[#f0f0f0] text-[#6a6a6a]">
+                  {agent.active ? "Available" : "Unavailable"}
+                </span>
               </div>
               <div className="mt-4 pt-4 border-t border-[#f0f0f0] grid grid-cols-3 gap-2 text-center font-sans text-sm">
                 <div>
@@ -124,12 +127,12 @@ export function AgentsPageContent({
                   <p className="font-semibold text-[#111111]">{agent.metrics?.leadsAssigned ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-[#a0a0a0]">Avg response</p>
+                  <p className="text-[#a0a0a0]">Avg reply</p>
                   <p className="font-semibold text-[#111111]">—</p>
                 </div>
                 <div>
-                  <p className="text-[#a0a0a0]">Appointments</p>
-                  <p className="font-semibold text-[#111111]">{agent.metrics?.appointmentsSet ?? 0}</p>
+                  <p className="text-[#a0a0a0]">Closed</p>
+                  <p className="font-semibold text-[#111111]">{agent.metrics?.closedCount ?? 0}</p>
                 </div>
               </div>
               <div className="mt-4 flex gap-2">

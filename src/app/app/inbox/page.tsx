@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -9,6 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MessageSquare, RefreshCw, Send, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { AirtableErrorFallback } from "@/components/app/AirtableErrorFallback";
 import { EmptyState } from "@/components/app/EmptyState";
@@ -30,11 +37,19 @@ interface Lead {
   id: string;
   name: string;
   phone?: string;
+  email?: string;
   source?: string;
   status?: LeadStatus;
   assignedTo?: string;
   assignedToName?: string;
   unreadCount?: number;
+}
+
+const INBOX_SOURCE_OPTIONS = ["All sources", "Website", "Realtor.com", "Referral", "Open house"] as const;
+type InboxSourceFilter = (typeof INBOX_SOURCE_OPTIONS)[number];
+
+function normalizeInboxSource(s: string | undefined): string {
+  return (s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 function formatRelative(time: string): string {
@@ -53,16 +68,24 @@ export default function InboxPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [body, setBody] = useState("");
-  const [searchName, setSearchName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "mine" | "unread" | "hot">("all");
+  const [sourceFilter, setSourceFilter] = useState<InboxSourceFilter>("All sources");
+  const [sessionAgentId, setSessionAgentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [demoEnabled, setDemoEnabled] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const filteredLeads = searchName.trim()
-    ? leads.filter((l) => l.name.toLowerCase().includes(searchName.trim().toLowerCase()))
-    : leads;
+  useEffect(() => {
+    fetch("/api/auth/session", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.data?.agentId != null) setSessionAgentId(data.data.agentId);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -88,6 +111,28 @@ export default function InboxPage() {
       setLoading(false);
     });
   }, [searchParams]);
+
+  const q = searchQuery.trim().toLowerCase();
+  const tabFiltered =
+    filterTab === "all"
+      ? leads
+      : filterTab === "mine"
+        ? leads.filter((l) => l.assignedTo === sessionAgentId)
+        : filterTab === "unread"
+          ? leads.filter((l) => (l.unreadCount ?? 0) > 0)
+          : leads.filter((l) => l.status === "qualified" || l.status === "appointment");
+  const sourceFiltered =
+    sourceFilter === "All sources"
+      ? tabFiltered
+      : tabFiltered.filter((l) => normalizeInboxSource(l.source) === normalizeInboxSource(sourceFilter));
+  const filteredLeads = q
+    ? sourceFiltered.filter(
+        (l) =>
+          (l.name ?? "").toLowerCase().includes(q) ||
+          (l.phone ?? "").replace(/\D/g, "").includes(q.replace(/\D/g, "")) ||
+          (l.email ?? "").toLowerCase().includes(q)
+      )
+    : sourceFiltered;
 
   useEffect(() => {
     const fromUrl = searchParams.get("leadId");
@@ -203,9 +248,9 @@ export default function InboxPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#a0a0a0]" />
             <Input
-              placeholder="Search conversations..."
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              placeholder="Search by name, phone, or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 h-10 bg-[#fafafa] border-[#e2e2e2] font-sans"
             />
           </div>
@@ -225,6 +270,36 @@ export default function InboxPage() {
                 {tab}
               </button>
             ))}
+          </div>
+          <div className="mt-3">
+            <Select value={sourceFilter} onValueChange={(v) => setSourceFilter(v as InboxSourceFilter)}>
+              <SelectTrigger className="w-full h-9 bg-[#fafafa] border-[#e2e2e2] font-sans text-sm">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                {INBOX_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt} value={opt}>
+                    {opt}
+                  </SelectItem>
+                ))}
+                <SelectItem value="__har_com__" disabled className="opacity-80">
+                  <span className="flex items-center gap-2">
+                    HAR.com
+                    <span className="rounded bg-[#f5f5f5] px-1.5 py-0.5 text-[10px] font-medium text-[#6a6a6a]">
+                      Coming soon
+                    </span>
+                  </span>
+                </SelectItem>
+                <SelectItem value="__zillow__" disabled className="opacity-80">
+                  <span className="flex items-center gap-2">
+                    Zillow
+                    <span className="rounded bg-[#f5f5f5] px-1.5 py-0.5 text-[10px] font-medium text-[#6a6a6a]">
+                      Coming soon
+                    </span>
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto p-0 min-h-0">
@@ -283,11 +358,11 @@ export default function InboxPage() {
         </CardContent>
       </Card>
 
-      {/* Right: thread */}
+      {/* Right: thread — message list scrolls, composer pinned at bottom */}
       <Card className="flex-1 flex flex-col min-w-0 min-h-0 rounded-2xl border-[#e2e2e2] overflow-hidden">
         {selectedLeadId && selectedLead ? (
-          <>
-            <CardHeader className="py-4 border-b border-[#e2e2e2] flex flex-row items-center justify-between gap-2 flex-wrap">
+          <div className="flex flex-col flex-1 min-h-0">
+            <CardHeader className="py-4 border-b border-[#e2e2e2] flex flex-row items-center justify-between gap-2 flex-wrap shrink-0">
               <div className="min-w-0">
                 <h2 className="font-display font-semibold text-[#111111] truncate">
                   {selectedLead.name}
@@ -331,7 +406,7 @@ export default function InboxPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+            <CardContent className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
               {messages.map((m) => {
                 const isOut = m.direction === "out";
                 const isSystem = false;
@@ -380,17 +455,23 @@ export default function InboxPage() {
                 </div>
               )}
             </CardContent>
-            <div className="p-4 border-t border-[#e2e2e2]">
+            <div className="shrink-0 p-4 border-t border-[#e2e2e2] bg-white">
               {demoEnabled && (
-                <p className="text-xs text-amber-600 mb-2 font-sans" title="Demo: messages stored locally; connect Twilio for real SMS">
+                <p className="text-xs text-amber-600 mb-2 font-sans" title="Demo: messages stored locally">
                   Demo: messages stored locally. Connect integrations in Settings for real SMS.
                 </p>
               )}
-              <form onSubmit={handleSend} className="flex gap-2">
+              <form ref={formRef} onSubmit={handleSend} className="flex gap-2">
                 <Textarea
                   placeholder={`Reply as ${agentName}...`}
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (body.trim()) formRef.current?.requestSubmit();
+                    }
+                  }}
                   rows={2}
                   className="resize-none flex-1 rounded-xl border-[#e2e2e2] font-sans"
                 />
@@ -404,7 +485,7 @@ export default function InboxPage() {
                 </Button>
               </form>
             </div>
-          </>
+          </div>
         ) : (
           <CardContent className="flex-1 flex items-center justify-center text-[#a0a0a0] font-sans">
             <MessageSquare className="h-12 w-12 mr-2" />

@@ -62,7 +62,7 @@ export const navGroups: NavGroup[] = [
   {
     label: "Me",
     items: [
-      { href: "/app/account", label: "Account", icon: User, roles: ["owner", "broker", "agent"], tooltip: "Account" },
+      { href: "/app/account", label: "Profile", icon: User, roles: ["owner", "broker", "agent"], tooltip: "Profile" },
     ],
   },
 ];

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession, getDemoEnabled } from "@/lib/auth";
+import { getAirtableUserPlan } from "@/lib/airtable";
 
 const OVERRIDE_COOKIE = "lh_session_override";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -12,7 +13,10 @@ export async function GET() {
       { status: 401 }
     );
   }
-  const demoEnabled = await getDemoEnabled(session);
+  const [demoEnabled, plan] = await Promise.all([
+    getDemoEnabled(session),
+    session.email ? getAirtableUserPlan(session.email) : Promise.resolve(null),
+  ]);
   return NextResponse.json({
     success: true,
     data: {
@@ -21,6 +25,8 @@ export async function GET() {
       effectiveRole: session.effectiveRole,
       userId: session.userId,
       demoEnabled,
+      platformRole: session.platformRole,
+      ...(plan != null && { plan }),
       ...(session.agentId != null && { agentId: session.agentId }),
       ...(session.email != null && { email: session.email }),
     },

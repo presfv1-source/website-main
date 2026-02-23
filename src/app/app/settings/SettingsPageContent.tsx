@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import type { Agent } from "@/lib/types";
 import type { Brokerage } from "@/lib/types";
 import { DevTestToolsSection } from "@/components/app/DevTestToolsSection";
@@ -195,60 +195,64 @@ export function SettingsPageContent({
     }
   }
 
-  const connections = [
-    { label: "SMS Line", configured: integrationStatus.twilio },
-    { label: "Lead intake", configured: integrationStatus.make },
-    { label: "Billing", configured: !!integrationStatus.stripe },
-  ];
-
   const showAdvanced = isOwner && !demoEnabled;
 
+  const [activeSection, setActiveSection] = useState<string>("brokerage-profile");
+
+  function scrollToSection(id: string) {
+    setActiveSection(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const sidebarLinks: { id: string; label: string }[] = [
+    { id: "brokerage-profile", label: "Brokerage Profile" },
+    { id: "agents-roles", label: "Agents & Roles" },
+    { id: "routing", label: "Routing" },
+    { id: "notifications", label: "Notifications" },
+    { id: "billing", label: "Billing" },
+  ];
+  if (isSuperAdmin) {
+    sidebarLinks.push(
+      { id: "integrations", label: "Integrations" },
+      { id: "ai", label: "AI Settings" },
+      { id: "danger", label: "Danger Zone" }
+    );
+  }
+
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <PageHeader
-        title="Settings"
-        subtitle="Brokerage profile, connections, and preferences."
-      />
+    <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+      <aside className="lg:w-56 shrink-0">
+        <nav className="sticky top-24 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
+          {sidebarLinks.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => scrollToSection(id)}
+              className={cn(
+                "text-left px-3 py-2 rounded-lg text-sm font-sans whitespace-nowrap transition-colors",
+                activeSection === id
+                  ? "bg-[#111111] text-white"
+                  : "text-[#6a6a6a] hover:bg-[#f5f5f5] hover:text-[#111111]",
+                id === "danger" && "text-red-600 hover:bg-red-50"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      </aside>
 
-      <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="flex flex-wrap h-auto gap-1 bg-[#f5f5f5] p-1 rounded-xl font-sans">
-          <TabsTrigger value="profile" className="rounded-lg data-[state=active]:bg-white">
-            Brokerage Profile
-          </TabsTrigger>
-          <TabsTrigger value="connections" className="rounded-lg data-[state=active]:bg-white">
-            Phone & Connections
-          </TabsTrigger>
-          <TabsTrigger value="routing" className="rounded-lg data-[state=active]:bg-white">
-            Routing
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="rounded-lg data-[state=active]:bg-white">
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="billing" className="rounded-lg data-[state=active]:bg-white">
-            Billing
-          </TabsTrigger>
-          {isSuperAdmin && (
-            <TabsTrigger value="integrations" className="rounded-lg data-[state=active]:bg-white">
-              Integrations
-            </TabsTrigger>
-          )}
-          {isSuperAdmin && (
-            <TabsTrigger value="ai" className="rounded-lg data-[state=active]:bg-white">
-              AI Settings
-            </TabsTrigger>
-          )}
-          {isSuperAdmin && (
-            <TabsTrigger value="danger" className="rounded-lg data-[state=active]:bg-white text-red-600">
-              Danger Zone
-            </TabsTrigger>
-          )}
-        </TabsList>
+      <div className="flex-1 min-w-0 space-y-8">
+        <PageHeader
+          title="Settings"
+          subtitle="Brokerage profile and preferences."
+        />
 
-        <TabsContent value="profile" className="mt-6">
+        <section id="brokerage-profile" className="scroll-mt-8">
           <Card className="rounded-2xl border-[#e2e2e2]">
             <CardHeader>
               <CardTitle className="font-display">Brokerage Profile</CardTitle>
-              <p className="text-sm text-[#a0a0a0] font-sans">Name, market city, timezone</p>
+              <p className="text-sm text-[#a0a0a0] font-sans">Name, lead intake number, timezone</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
@@ -262,13 +266,17 @@ export function SettingsPageContent({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="brokerage-phone" className="font-sans">Phone</Label>
+                  <Label htmlFor="brokerage-phone" className="font-sans">Your lead intake number</Label>
                   <Input
                     id="brokerage-phone"
                     value={brokeragePhone}
                     onChange={(e) => setBrokeragePhone(e.target.value)}
                     className="font-sans"
+                    placeholder="+1 555 000 0000"
                   />
+                  <p className="text-xs text-[#a0a0a0] font-sans">
+                    This is the number where new leads first arrive.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="brokerage-tz" className="font-sans">Timezone</Label>
@@ -296,35 +304,30 @@ export function SettingsPageContent({
                 disabled={generalSaving}
                 className="bg-[#111111] hover:opacity-90 font-sans"
               >
-                {generalSaving ? "Saving…" : "Save changes"}
+                {generalSaving ? "Saving…" : "Save Profile"}
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </section>
 
-        <TabsContent value="connections" className="mt-6 space-y-4">
+        <section id="agents-roles" className="scroll-mt-8">
           <Card className="rounded-2xl border-[#e2e2e2]">
             <CardHeader>
-              <CardTitle className="font-display">Phone & Connections</CardTitle>
-              <p className="text-sm text-[#a0a0a0] font-sans">Status of your SMS line, lead intake, and billing</p>
+              <CardTitle className="font-display">Agents & Roles</CardTitle>
+              <p className="text-sm text-[#a0a0a0] font-sans">Manage your team and who receives leads</p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {connections.map((c) => (
-                <div key={c.label} className="flex items-center justify-between rounded-xl border border-[#e2e2e2] px-4 py-3">
-                  <span className="font-sans font-medium text-[#111111]">{c.label}</span>
-                  <span className={c.configured ? "text-green-600 font-sans text-sm" : "text-amber-600 font-sans text-sm"}>
-                    {c.configured ? "Connected ✓" : "Not configured"}
-                  </span>
-                </div>
-              ))}
-              {!integrationStatus.twilio && isOwner && (
-                <p className="text-xs text-[#a0a0a0] font-sans">{INTEGRATION_OWNER_HELPER}</p>
-              )}
+            <CardContent>
+              <p className="text-sm text-[#6a6a6a] font-sans mb-4">
+                Add agents and set who is accepting leads in the Agents page.
+              </p>
+              <Button asChild className="bg-[#111111] hover:opacity-90 font-sans">
+                <a href="/app/agents">Open Agents</a>
+              </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </section>
 
-        <TabsContent value="routing" className="mt-6">
+        <section id="routing" className="scroll-mt-8">
           <Card className="rounded-2xl border-[#e2e2e2]">
             <CardHeader>
               <CardTitle className="font-display">Routing</CardTitle>
@@ -339,9 +342,9 @@ export function SettingsPageContent({
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </section>
 
-        <TabsContent value="notifications" className="mt-6">
+        <section id="notifications" className="scroll-mt-8">
           <Card className="rounded-2xl border-[#e2e2e2]">
             <CardHeader>
               <CardTitle className="font-display">Notifications</CardTitle>
@@ -365,9 +368,9 @@ export function SettingsPageContent({
               <Button className="bg-[#111111] hover:opacity-90 font-sans">Save</Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </section>
 
-        <TabsContent value="billing" className="mt-6">
+        <section id="billing" className="scroll-mt-8">
           <Card className="rounded-2xl border-[#e2e2e2]">
             <CardHeader>
               <CardTitle className="font-display">Billing</CardTitle>
@@ -382,23 +385,23 @@ export function SettingsPageContent({
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </section>
 
         {isSuperAdmin && (
-          <TabsContent value="integrations" className="mt-6 space-y-4">
+          <section id="integrations" className="scroll-mt-8">
             <Card className="rounded-2xl border-[#e2e2e2]">
               <CardHeader>
                 <CardTitle className="font-display">Integrations</CardTitle>
-                <p className="text-sm text-[#a0a0a0] font-sans">Twilio, Airtable, Make.com — platform admin only</p>
+                <p className="text-sm text-[#a0a0a0] font-sans">SMS, Airtable, Make.com — platform admin only</p>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-[#6a6a6a] font-sans">Configure in Advanced (Owner Only) below or via environment variables.</p>
               </CardContent>
             </Card>
-          </TabsContent>
+          </section>
         )}
         {isSuperAdmin && (
-          <TabsContent value="ai" className="mt-6 space-y-4">
+          <section id="ai" className="scroll-mt-8">
             <Card className="rounded-2xl border-[#e2e2e2]">
               <CardHeader>
                 <CardTitle className="font-display">AI Settings</CardTitle>
@@ -408,10 +411,10 @@ export function SettingsPageContent({
                 <p className="text-sm text-[#6a6a6a] font-sans">Configure in Advanced (Owner Only) below.</p>
               </CardContent>
             </Card>
-          </TabsContent>
+          </section>
         )}
         {isSuperAdmin && (
-          <TabsContent value="danger" className="mt-6">
+          <section id="danger" className="scroll-mt-8">
             <Card className="rounded-2xl border-2 border-red-200 shadow-sm">
               <CardHeader>
                 <CardTitle className="font-display text-red-700 flex items-center gap-2">
@@ -461,28 +464,28 @@ export function SettingsPageContent({
                 </p>
               </CardContent>
             </Card>
-          </TabsContent>
+          </section>
         )}
-      </Tabs>
 
-      {showAdvanced && (
-        <AdvancedOwnerSection
-          isOwner={isOwner}
-          demoEnabled={demoEnabled}
-          integrationStatus={integrationStatus}
-          devToolsPhone={devToolsPhone}
-          qualPrompt={qualPrompt}
-          setQualPrompt={setQualPrompt}
-          firstMsg={firstMsg}
-          setFirstMsg={setFirstMsg}
-          followUpMsg={followUpMsg}
-          setFollowUpMsg={setFollowUpMsg}
-          INTEGRATION_OWNER_HELPER={INTEGRATION_OWNER_HELPER}
-          INTEGRATION_NON_OWNER_HELPER={INTEGRATION_NON_OWNER_HELPER}
-        />
-      )}
+        {showAdvanced && (
+          <AdvancedOwnerSection
+            isOwner={isOwner}
+            demoEnabled={demoEnabled}
+            integrationStatus={integrationStatus}
+            devToolsPhone={devToolsPhone}
+            qualPrompt={qualPrompt}
+            setQualPrompt={setQualPrompt}
+            firstMsg={firstMsg}
+            setFirstMsg={setFirstMsg}
+            followUpMsg={followUpMsg}
+            setFollowUpMsg={setFollowUpMsg}
+            INTEGRATION_OWNER_HELPER={INTEGRATION_OWNER_HELPER}
+            INTEGRATION_NON_OWNER_HELPER={INTEGRATION_NON_OWNER_HELPER}
+          />
+        )}
 
-      {showAdvanced && <DevTestToolsSection phoneNumber={devToolsPhone} />}
+        {showAdvanced && <DevTestToolsSection phoneNumber={devToolsPhone} />}
+      </div>
     </div>
   );
 }

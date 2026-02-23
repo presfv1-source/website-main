@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { CreditCard, Zap, Building2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { BILLING_PLANS } from "@/lib/marketingContent";
+import { useViewPlan } from "@/components/app/PlanViewSelector";
 
 type PlanId = "free" | "essentials" | "pro" | "enterprise";
 
@@ -21,10 +22,19 @@ function getPriceId(planId: string): string {
   return "";
 }
 
-export function BillingPageClient() {
+interface BillingPageClientProps {
+  isSuperAdmin?: boolean;
+}
+
+export function BillingPageClient({ isSuperAdmin = false }: BillingPageClientProps) {
   const [loading, setLoading] = useState(false);
   const [planId, setPlanId] = useState<PlanId | null>(null);
   const [hasStripe, setHasStripe] = useState(false);
+  const viewPlan = useViewPlan();
+  // When super_admin, show view-as plan for display only; real planId still used for checkout/API.
+  // Map viewPlan "essential" to API/Stripe plan id "essentials" for lookup.
+  const displayPlanId: PlanId =
+    isSuperAdmin ? (viewPlan === "essential" ? "essentials" : viewPlan) : (planId ?? "free");
 
   useEffect(() => {
     fetch("/api/billing/plan")
@@ -83,7 +93,7 @@ export function BillingPageClient() {
   }
 
   const plansToShow = BILLING_PLANS.filter((p) => p.id === "essentials" || p.id === "pro");
-  const currentPlanFromPlans = planId != null ? BILLING_PLANS.find((p) => p.id === planId) : undefined;
+  const currentPlanFromPlans = BILLING_PLANS.find((p) => p.id === displayPlanId);
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -96,19 +106,28 @@ export function BillingPageClient() {
         🔒 You&apos;re on beta pricing. Your rate is locked as long as you stay subscribed.
       </div>
 
+      {isSuperAdmin && (
+        <div className="rounded-2xl border border-dashed border-amber-400 bg-amber-50/50 px-4 py-2 text-sm text-amber-800 font-sans">
+          Viewing as <strong>{displayPlanId === "pro" ? "Pro" : "Essential"}</strong> plan (super_admin preview)
+        </div>
+      )}
       <Card className="rounded-2xl border-[#e2e2e2] overflow-hidden">
         <CardContent className="py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <Badge className="bg-[#111111] text-white font-sans">
-                {planId === null ? "…" : planId === "free" ? "Free" : planId.charAt(0).toUpperCase() + planId.slice(1)}
+                {planId === null && !isSuperAdmin
+                  ? "…"
+                  : displayPlanId === "free"
+                    ? "Free"
+                    : displayPlanId.charAt(0).toUpperCase() + displayPlanId.slice(1)}
               </Badge>
               <p className="text-2xl font-display font-bold text-[#111111] mt-2">
-                {planId === null
+                {planId === null && !isSuperAdmin
                   ? ""
                   : currentPlanFromPlans?.price != null
                     ? `$${currentPlanFromPlans.price}/mo`
-                    : planId === "free"
+                    : displayPlanId === "free"
                       ? ""
                       : currentPlanFromPlans?.id === "enterprise"
                         ? "Custom"
@@ -141,7 +160,7 @@ export function BillingPageClient() {
       <div className="grid gap-6 md:grid-cols-2">
         {plansToShow.map((plan) => {
           const Icon = PLAN_ICONS[plan.id as keyof typeof PLAN_ICONS] ?? CreditCard;
-          const isCurrent = planId !== null && plan.id === planId;
+          const isCurrent = plan.id === displayPlanId;
           const priceId = getPriceId(plan.id);
           return (
             <Card

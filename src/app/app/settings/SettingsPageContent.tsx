@@ -34,6 +34,7 @@ const INTEGRATION_NON_OWNER_HELPER =
 interface AdvancedOwnerSectionProps {
   isOwner: boolean;
   demoEnabled: boolean;
+  isSuperAdmin: boolean;
   integrationStatus: { twilio: boolean; airtable: boolean; make: boolean; stripe?: boolean };
   devToolsPhone: string;
   qualPrompt: string;
@@ -48,6 +49,7 @@ interface AdvancedOwnerSectionProps {
 
 function AdvancedOwnerSection({
   demoEnabled,
+  isSuperAdmin,
   integrationStatus,
   devToolsPhone,
   qualPrompt,
@@ -77,10 +79,11 @@ function AdvancedOwnerSection({
             <p className="text-sm font-display font-semibold text-[#111111]">Demo mode</p>
             <DemoToggle demoEnabled={demoEnabled} disabled={false} className="max-w-xs" />
           </div>
+          {isSuperAdmin && (
           <div className="space-y-4">
             <p className="text-sm font-display font-semibold text-[#111111]">Integration details</p>
             {[
-              { key: "twilio", name: "Twilio (SMS)", configured: integrationStatus.twilio, detail: devToolsPhone },
+              { key: "twilio", name: "SMS", configured: integrationStatus.twilio, detail: devToolsPhone },
               { key: "airtable", name: "Airtable", configured: integrationStatus.airtable, detail: "Base linked" },
               { key: "make", name: "Make.com", configured: integrationStatus.make, detail: "Webhook URL" },
             ].map((int) => {
@@ -101,6 +104,7 @@ function AdvancedOwnerSection({
               <p className="text-xs text-[#a0a0a0] font-sans mt-1">{INTEGRATION_OWNER_HELPER}</p>
             </div>
           </div>
+          )}
           <div className="space-y-4">
             <p className="text-sm font-display font-semibold text-[#111111]">First message & follow-up</p>
             <div>
@@ -471,6 +475,7 @@ export function SettingsPageContent({
           <AdvancedOwnerSection
             isOwner={isOwner}
             demoEnabled={demoEnabled}
+            isSuperAdmin={isSuperAdmin}
             integrationStatus={integrationStatus}
             devToolsPhone={devToolsPhone}
             qualPrompt={qualPrompt}

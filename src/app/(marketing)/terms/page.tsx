@@ -29,7 +29,7 @@ export default function TermsPage() {
           </p>
           <h2 className="font-semibold text-[var(--ink)] mt-6">SMS and messaging</h2>
           <p>
-            LeadHandler sends and receives SMS on your behalf via Twilio. By adding leads and using the platform, you represent that you have obtained consent from recipients to receive SMS from your brokerage. Message frequency varies by lead activity; typical use includes initial intake and follow-up. Recipients may opt out at any time by replying <strong className="text-[var(--ink)]">STOP</strong> to any message; we and our carriers support standard opt-out keywords. Message and data rates may apply. Our SMS practices comply with applicable A2P (application-to-person) and carrier requirements.
+            LeadHandler sends and receives SMS on your behalf via our SMS provider. By adding leads and using the platform, you represent that you have obtained consent from recipients to receive SMS from your brokerage. Message frequency varies by lead activity; typical use includes initial intake and follow-up. Recipients may opt out at any time by replying <strong className="text-[var(--ink)]">STOP</strong> to any message; we and our carriers support standard opt-out keywords. Message and data rates may apply. Our SMS practices comply with applicable A2P (application-to-person) and carrier requirements.
           </p>
           <p>
             The service is provided as-is. We do our best to keep it available and secure but do not guarantee uninterrupted service. Billing is handled via Stripe; subscription terms and cancellation follow your plan and our billing page.

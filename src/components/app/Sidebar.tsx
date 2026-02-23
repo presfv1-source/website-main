@@ -12,7 +12,6 @@ import {
   BarChart3,
   CreditCard,
   Settings,
-  UserCircle,
   LogOut,
 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
@@ -86,20 +85,6 @@ export function Sidebar({ role: roleProp, className, isSuperAdmin: isSuperAdminP
 
   const bottomSection = (
     <div className="border-t border-[#e2e2e2] p-2 mt-auto shrink-0">
-      <Link
-        href="/app/account"
-        className={cn(
-          "flex items-center gap-3 mx-2 px-3 py-3 rounded-xl transition-colors duration-150",
-          pathname === "/app/account" || pathname.startsWith("/app/account/")
-            ? "bg-[#f5f5f5] text-[#111111] font-semibold"
-            : "text-[#6a6a6a] hover:bg-[#f5f5f5] hover:text-[#111111]"
-        )}
-      >
-        <UserCircle className="w-5 h-5 flex-shrink-0" />
-        <span className="text-sm font-medium font-sans whitespace-nowrap truncate">
-          Account
-        </span>
-      </Link>
       <div className="flex items-center gap-3 px-3 py-3 mx-2">
         <div className="h-8 w-8 rounded-full bg-[#f0f0f0] flex items-center justify-center text-xs font-medium text-[#111111] flex-shrink-0">
           {initials}
@@ -184,19 +169,6 @@ export function SidebarNavContent({
           </Link>
         );
       })}
-      <Link
-        href="/app/account"
-        onClick={onLinkClick}
-        className={cn(
-          "flex items-center gap-3 rounded-xl px-4 py-3 mx-2 mt-4 border-t border-[#e2e2e2] pt-4 transition-colors",
-          pathname === "/app/account"
-            ? "bg-[#f5f5f5] text-[#111111] font-semibold"
-            : "text-[#6a6a6a] hover:bg-[#f5f5f5] hover:text-[#111111]"
-        )}
-      >
-        <UserCircle className="h-5 w-5 flex-shrink-0" />
-        <span className="text-sm font-medium font-sans">Account</span>
-      </Link>
     </nav>
   );
 }

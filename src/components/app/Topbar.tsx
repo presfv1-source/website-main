@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarNavContent } from "./Sidebar";
 import { AccountMenu } from "./AccountMenu";
+import { PlanViewSelector } from "./PlanViewSelector";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
 
@@ -67,6 +68,9 @@ export function Topbar({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {isSuperAdminProp && (
+            <PlanViewSelector className="hidden sm:block" />
+          )}
           <Button
             variant="ghost"
             size="icon"

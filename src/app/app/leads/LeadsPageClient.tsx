@@ -95,7 +95,7 @@ export function LeadsPageClient({ leads: initialLeads, agents, airtableError, de
       );
     }
     if (statusFilter !== "all") list = list.filter((l) => l.status === statusFilter);
-    if (sourceFilter !== "all") list = list.filter((l) => (l.source ?? "") === sourceFilter);
+    if (sourceFilter !== "all" && sourceFilter !== "__har_com__" && sourceFilter !== "__zillow__") list = list.filter((l) => (l.source ?? "") === sourceFilter);
     if (agentFilter !== "all") list = list.filter((l) => l.assignedTo === agentFilter);
     return list;
   }, [initialLeads, search, statusFilter, sourceFilter, agentFilter]);
@@ -365,6 +365,22 @@ export function LeadsPageClient({ leads: initialLeads, agents, airtableError, de
                 {s}
               </SelectItem>
             ))}
+            <SelectItem value="__har_com__" disabled className="opacity-80">
+              <span className="flex items-center gap-2">
+                HAR.com
+                <span className="rounded bg-[#f5f5f5] px-1.5 py-0.5 text-[10px] font-medium text-[#6a6a6a]">
+                  Coming soon
+                </span>
+              </span>
+            </SelectItem>
+            <SelectItem value="__zillow__" disabled className="opacity-80">
+              <span className="flex items-center gap-2">
+                Zillow
+                <span className="rounded bg-[#f5f5f5] px-1.5 py-0.5 text-[10px] font-medium text-[#6a6a6a]">
+                  Coming soon
+                </span>
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
         {isOwner && (

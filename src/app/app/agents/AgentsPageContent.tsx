@@ -92,20 +92,20 @@ export function AgentsPageContent({
           return (
             <div
               key={agent.id}
-              className="bg-white rounded-2xl border border-[#e2e2e2] p-6 flex flex-col"
+              className="bg-white rounded-2xl border border-[#e2e2e2] p-5 flex flex-col"
             >
-              <div className="flex items-start gap-4">
-                <div className="h-12 w-12 rounded-full bg-[#e2e2e2] flex items-center justify-center text-[#222222] font-display font-semibold flex-shrink-0">
+              <div className="flex items-start gap-3">
+                <div className="h-11 w-11 rounded-full bg-[#e2e2e2] flex items-center justify-center text-[#222222] font-display font-semibold text-sm flex-shrink-0">
                   {initials}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-display font-semibold text-[#111111] truncate">
+                  <h3 className="font-display font-semibold text-[#111111] truncate text-base">
                     {agent.name}
                   </h3>
-                  <span className="inline-flex rounded-full bg-[#f5f5f5] px-2 py-0.5 text-xs font-medium text-[#6a6a6a] font-sans">
-                    Agent
-                  </span>
-                  <div className="flex items-center gap-2 mt-2 font-sans">
+                  <p className="text-xs font-sans text-[#6a6a6a] mt-0.5">
+                    {agent.active ? "Available" : "Unavailable"}
+                  </p>
+                  <div className="flex items-center gap-2 mt-3 font-sans">
                     <Switch
                       checked={agent.active}
                       onCheckedChange={(checked) =>
@@ -117,9 +117,6 @@ export function AgentsPageContent({
                     </span>
                   </div>
                 </div>
-                <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium font-sans shrink-0 bg-[#f0f0f0] text-[#6a6a6a]">
-                  {agent.active ? "Available" : "Unavailable"}
-                </span>
               </div>
               <div className="mt-4 pt-4 border-t border-[#f0f0f0] grid grid-cols-3 gap-2 text-center font-sans text-sm">
                 <div>

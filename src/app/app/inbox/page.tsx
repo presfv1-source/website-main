@@ -455,7 +455,7 @@ export default function InboxPage() {
                 </div>
               )}
             </CardContent>
-            <div className="shrink-0 p-4 border-t border-[#e2e2e2] bg-white">
+            <div className="flex-shrink-0 min-h-[72px] p-4 border-t border-[#e2e2e2] bg-white">
               {demoEnabled && (
                 <p className="text-xs text-amber-600 mb-2 font-sans" title="Demo: messages stored locally">
                   Demo: messages stored locally. Connect integrations in Settings for real SMS.

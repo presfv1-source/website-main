@@ -255,8 +255,8 @@ export default function ContactPage() {
                     How fast can I get started?
                   </h3>
                   <p className="font-sans text-[var(--muted)] text-sm leading-relaxed">
-                    You can be live in under 30 minutes. We&apos;ll help you connect your
-                    lead sources and set up routing.
+                    No technical setup needed. We&apos;ll help you connect your lead
+                    sources and set up routing.
                   </p>
                 </div>
                 <div>

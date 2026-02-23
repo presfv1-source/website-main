@@ -34,10 +34,13 @@ export function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash) {
-      const timer = setTimeout(() => scrollToHash(window.location.hash), 100);
-      return () => clearTimeout(timer);
-    }
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    // After route change to /, give the page time to mount sections before scrolling
+    const delay = pathname === "/" ? 200 : 100;
+    const timer = setTimeout(() => scrollToHash(hash), delay);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   function handleNavClick(

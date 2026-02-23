@@ -13,7 +13,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How fast is setup?",
-    a: "Most brokerages are live in under an hour. One number, your routing rules, done.",
+    a: "No technical setup needed. We'll help you connect your lead sources and get routing in place.",
   },
   {
     q: "Is this available outside Texas?",
